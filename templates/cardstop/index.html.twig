@@ -1,0 +1,158 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Fernley Main Street America's Poker Run{% endblock %}
+
+{% block body %}
+    <div class="bg-secondary mb-2 px-2 d-flex">
+        <a class="text-white" href="{{ path('app_welcome') }}">Poker Run</a>
+        <span class="mx-1">&gt;</span>
+        {% if candidate and candidate.id %}
+            <a class="text-white"href="{{ path('app_candidate_edit', {'id': candidate.id}) }}">Edit {{ candidate.Name }}</a>
+           <span class="mx-1">&gt;</span>
+        {% endif %}
+        <span class="text-white">Vote</span>
+        <span class="flex-grow-1 text-end last">
+            <a class="btn btn-success btn-sm" href="{{ path('app_candidate_new') }}">New Babe</a>
+        </span>
+    </div>
+
+    {% set currentIndex = (currentIndex is defined) ? currentIndex + 1 : 0 %}
+
+    {# Search form for Category & Gender (defaults come from user prefs) #}
+    <div class="mx-3 mb-3 p-2" style="background-color: #d6d6d6">
+        <form method="get" action="{{ path('app_welcome') }}" class="row g-2 align-items-end">
+            <input type="hidden" name="currentIndex" value="{{currentIndex}}"/>
+            <div class="col-auto me-2">
+                <label for="category" class="form-label small mb-1">Category</label>
+                <select id="category" name="category" class="form-select">
+                    <option value="">Any</option>
+                    {% for cat in categories %}
+                        <option value="{{ cat.name }}" {% if cat.name == selectedCategory %}selected{% endif %}>{{ cat.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="col-auto me-2">
+                <label for="gender" class="form-label small mb-1">Gender</label>
+                <select id="gender" name="gender" class="form-select">
+                    <option value="">Any</option>
+                    {% for g in genderOptions %}
+                        <option value="{{ g }}" {% if g == selectedGender %}selected{% endif %}>{{ g }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="col-auto">
+                <button type="submit" class="btn btn-primary">Next Babe</button>
+            </div>
+        </form>
+    </div>
+
+    {% if candidate and candidate.id %}
+        {% set disable_vote = (existingVote) ? "disabled='1'" : "" %}
+        <div class="alert alert-danger mt-2 mb-4 text-center">
+            <h1>Smash or Pass</h1>
+            <form method="get" action="{{ path('app_user_vote_vote') }}" class="row g-2 align-items-end">
+                <input type="hidden" name="candidate_id" value="{{ candidate.id }}">
+                <input type="hidden" name="category" value="{{ selectedCategory }}">
+                <input type="hidden" name="gender" value="{{ selectedGender }}">
+                <input type="hidden" name="currentIndex" value="{{currentIndex}}"/>
+                <div>
+                    <button type="submit" id="smash_1" name="smash" class="btn btn-lg btn-success" {{ disable_vote }} value="1">Smash</button>
+                    <button type="submit" id="smash_0" name="smash" class="btn btn-lg btn-danger" {{ disable_vote }} value="0">Pass</button>
+                </div>
+            </form>
+        </div>
+    {% endif %}
+
+    {% if candidate %}
+        {% set gq = candidate.Name|replace({' ': '+'}) ~ '+' ~ candidate.Categories|map(c=>c.Name)|join('+')|replace({' ': '+'}) %}
+        <div class="row mx-1">
+            <div class="col-md-6 text-center">
+                {% if candidate.imgurl %}
+                    <a href="https://www.google.com/search?q={{ gq }}" target="_blank">
+                        <img src="{{ candidate.imgurl }}" alt="Candidate image" class="img-fluid img-thumbnail mt-2" style="max-height:600px">
+                    </a>
+                {% endif %}
+            </div>
+            <div class="col-md-6">
+                <a class='fs-6' href="https://www.google.com/search?q={{ gq }}" target="_blank">
+                    <h3>{{ candidate.Name }}</h3>
+                </a>
+                <div><b>Categories:</b> {{ candidate.Categories|map(c=>c.Name)|join(', ') }}</div>
+                <table class="table table-bordered">
+                    <tbody>
+                        <tr>
+                            <th class="text-end bg-secondary">Id</th>
+                            <td>{{ candidate.id }}</td>
+                        </tr>
+                        <tr>
+                            <th class="text-end bg-secondary">Bio</th>
+                            <td>{{ candidate.Bio }}</td>
+                        </tr>
+                        <tr>
+                            <th class="text-end bg-secondary">Birthdate</th>
+                            <td>{{ candidate.Birthdate ? candidate.Birthdate|date('Y-m-d') : '' }}</td>
+                        </tr>
+                        <tr>
+                            <th class="text-end bg-secondary">Height</th>
+                            <td>{{ candidate.Height }}</td>
+                        </tr>
+                        <tr>
+                            <th class="text-end bg-secondary">Weight</th>
+                            <td>{{ candidate.Weight }}</td>
+                        </tr>
+                        <tr>
+                            <th class="text-end bg-secondary">Home Town</th>
+                            <td>{{ candidate.HomeTown }}</td>
+                        </tr>
+                        <tr>
+                            <th class="text-end bg-secondary">Married</th>
+                            <td>{{ candidate.Married ? 'Yes' : 'No' }}</td>
+                        </tr>
+                        <tr>
+                            <th class="text-end bg-secondary">Income</th>
+                            <td>{{ candidate.Income }}</td>
+                        </tr>
+                        <tr>
+                            <th class="text-end bg-secondary">Political Affiliation</th>
+                            <td>{{ candidate.PoliticalAffiliation }}</td>
+                        </tr>
+                        <tr>
+                            <th class="text-end bg-secondary">Interests</th>
+                            <td>{{ candidate.Interests }}</td>
+                        </tr>
+                        <tr>
+                            <th class="text-end bg-secondary">Lifestyle</th>
+                            <td>{{ candidate.Lifestyle }}</td>
+                        </tr>
+                        <tr>
+                            <th class="text-end bg-secondary">Additional Information</th>
+                            <td>{{ candidate.AdditionalInformation }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        {% if candidate and candidate.id %}
+            <div class="alert alert-danger mt-2 mb-4 text-center">
+                <h1>Smash or Pass</h1>
+                <form method="get" action="{{ path('app_user_vote_vote') }}" class="row g-2 align-items-end">
+                    <input type="hidden" name="candidate_id" value="{{ candidate.id }}">
+                    <input type="hidden" name="category" value="{{ selectedCategory }}">
+                    <input type="hidden" name="gender" value="{{ selectedGender }}">
+                    <input type="hidden" name="currentIndex" value="{{currentIndex}}"/>
+                    <div>
+                        <button type="submit" id="smash_1" name="smash" class="btn btn-lg btn-success" {{ disable_vote }} value="1">Smash</button>
+                        <button type="submit" id="smash_0" name="smash" class="btn btn-lg btn-danger" {{ disable_vote }} value="0">Pass</button>
+                    </div>
+                </form>
+            </div>
+        {% endif %}
+
+    {% else %}
+        <div class="alert alert-warning">No Babes found that in Category ( {{ selectedCategory }} ) that are {{ selectedGender }}</div>
+    {% endif %}
+
+{% endblock %}

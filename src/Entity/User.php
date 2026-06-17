@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
@@ -20,6 +22,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(length: 180)]
     private ?string $email = null;
+
+    #[ORM\Column(length: 180)]
+    private ?string $firstName = null;
+
+    #[ORM\Column(length: 180)]
+    private ?string $lastName = null;
 
     /**
      * @var list<string> The user roles
@@ -42,6 +50,26 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 1024, nullable: true)]
     private ?string $avatar = null;
 
+    #[ORM\ManyToOne(inversedBy: 'admins')]
+    private ?CardStop $cardStop = null;
+
+    #[ORM\OneToOne(mappedBy: 'Player', cascade: ['persist', 'remove'])]
+    private ?PokerHand $pokerHand = null;
+
+    /**
+     * @var Collection<int, PlayingCard>
+     */
+    #[ORM\OneToMany(targetEntity: PlayingCard::class, mappedBy: 'player', orphanRemoval: true)]
+    private Collection $card_list;
+
+    #[ORM\OneToOne(mappedBy: 'Player', cascade: ['persist', 'remove'])]
+    private ?PlayerLocation $location = null;
+
+    public function __construct()
+    {
+        $this->card_list = new ArrayCollection();
+    }
+
     public function getId(): ?int
     {
         return $this->id;
@@ -55,6 +83,30 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setEmail(string $email): static
     {
         $this->email = $email;
+
+        return $this;
+    }
+
+    public function getFirstName(): ?string
+    {
+        return $this->firstName;
+    }
+
+    public function setFirstName(string $firstName): static
+    {
+        $this->firstName = $firstName;
+
+        return $this;
+    }
+
+    public function getLastName(): ?string
+    {
+        return $this->lastName;
+    }
+
+    public function setLastName(string $lastName): static
+    {
+        $this->lastName = $lastName;
 
         return $this;
     }
@@ -156,6 +208,82 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setAvatar(?string $avatar): static
     {
         $this->avatar = $avatar;
+
+        return $this;
+    }
+
+    public function getCardStop(): ?CardStop
+    {
+        return $this->cardStop;
+    }
+
+    public function setCardStop(?CardStop $cardStop): static
+    {
+        $this->cardStop = $cardStop;
+
+        return $this;
+    }
+
+    public function getPokerHand(): ?PokerHand
+    {
+        return $this->pokerHand;
+    }
+
+    public function setPokerHand(PokerHand $pokerHand): static
+    {
+        // set the owning side of the relation if necessary
+        if ($pokerHand->getPlayer() !== $this) {
+            $pokerHand->setPlayer($this);
+        }
+
+        $this->pokerHand = $pokerHand;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, PlayingCard>
+     */
+    public function getCardList(): Collection
+    {
+        return $this->card_list;
+    }
+
+    public function addCardList(PlayingCard $cardList): static
+    {
+        if (!$this->card_list->contains($cardList)) {
+            $this->card_list->add($cardList);
+            $cardList->setPlayer($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCardList(PlayingCard $cardList): static
+    {
+        if ($this->card_list->removeElement($cardList)) {
+            // set the owning side to null (unless already changed)
+            if ($cardList->getPlayer() === $this) {
+                $cardList->setPlayer(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getLocation(): ?PlayerLocation
+    {
+        return $this->location;
+    }
+
+    public function setLocation(PlayerLocation $location): static
+    {
+        // set the owning side of the relation if necessary
+        if ($location->getPlayer() !== $this) {
+            $location->setPlayer($this);
+        }
+
+        $this->location = $location;
 
         return $this;
     }

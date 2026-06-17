@@ -3,8 +3,10 @@
 namespace App\Controller;
 
 use App\Entity\User;
+use App\DataFixtures\PlayerAction;
 use App\Form\RegistrationFormType;
 use App\Security\EmailVerifier;
+use App\Message\PlayerMessage;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -14,11 +16,11 @@ use Symfony\Component\Mime\Address;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Contracts\Translation\TranslatorInterface;
+use Symfony\Component\Messenger\MessageBusInterface;
 use SymfonyCasts\Bundle\VerifyEmail\Exception\VerifyEmailExceptionInterface;
 
-class RegistrationController extends AbstractController
-{
-    public function __construct(private EmailVerifier $emailVerifier)
+class RegistrationController extends AbstractController {
+    public function __construct(private EmailVerifier $emailVerifier, private MessageBusInterface $messageBus)
     {
     }
 
@@ -29,7 +31,8 @@ class RegistrationController extends AbstractController
         $form = $this->createForm(RegistrationFormType::class, $user);
         $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid())
+        {
             /** @var string $plainPassword */
             $plainPassword = $form->get('plainPassword')->getData();
 
@@ -42,15 +45,16 @@ class RegistrationController extends AbstractController
             // generate a signed url and email it to the user
             $this->emailVerifier->sendEmailConfirmation('app_verify_email', $user,
                 (new TemplatedEmail())
-                    ->from(new Address('info@fernleychamber.com', 'Fernley Chamber of Commerce'))
+                    ->from(new Address('info@mainstreetfernley.com', 'Main Street Fernley'))
                     ->to((string) $user->getEmail())
                     ->subject('Please Confirm your Email')
                     ->htmlTemplate('registration/confirmation_email.html.twig')
             );
 
             // do anything else you need here, like send an email
+            $this->messageBus->dispatch(new PlayerMessage($user->getEmail(), $user->getFirstName(), $user->getLastName(), PlayerAction::$Register));
 
-            return $this->redirectToRoute('admin');
+            return $this->redirectToRoute('home');
         }
 
         return $this->render('registration/register.html.twig', [
@@ -64,11 +68,14 @@ class RegistrationController extends AbstractController
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
 
         // validate email confirmation link, sets User::isVerified=true and persists
-        try {
+        try
+        {
             /** @var User $user */
             $user = $this->getUser();
             $this->emailVerifier->handleEmailConfirmation($request, $user);
-        } catch (VerifyEmailExceptionInterface $exception) {
+        }
+        catch (VerifyEmailExceptionInterface $exception)
+        {
             $this->addFlash('verify_email_error', $translator->trans($exception->getReason(), [], 'VerifyEmailBundle'));
 
             return $this->redirectToRoute('app_register');

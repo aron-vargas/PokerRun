@@ -1,0 +1,53 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Fernley Main Street America's Poker Run{% endblock %}
+
+{% block body %}
+    <div class="bg-secondary mb-2 px-2 d-flex">
+        <a class="text-white" href="{{ path('app_welcome') }}">Poker Run</a>
+        <span class="mx-1">&gt;</span>
+        {% if user and user.id %}
+            {% if user.location and user.location.isVerified %}
+                <span class="text-white">Pick Card</span>
+                <span class="mx-1">&gt;</span>
+                <a class="text-white" href="{{ path('app_check_out') }}">Check Out</a>
+                <span class="mx-1">&gt;</span>
+            {% else %}
+                <a class="text-white" href="{{ path('app_check_in') }}">Check In</a>
+                <span class="mx-1">&gt;</span>
+            {% endif %}
+            {% if user.location and user.location.isVerified and not user.location.extra_card %}
+                <span class="flex-grow-1 text-end last">
+                    <a class="btn btn-success btn-sm" href="{{ path('app_extra') }}">Extra Card</a>
+                </span>
+            {% endif %}
+        {% endif %}
+    </div>
+
+    {% if user.location and user.location.isVerified %}
+        <div class="alert alert-success">
+            <img class="me-2" src="{{ user.location.CardStop.logo }}" style="height: 50px; width: auto;"/>
+            You are currently checked in at {{ user.location.CardStop.card_stop_name }}
+        </div>
+        {% if user.location.first_card %}
+            <div class="alert alert-info">
+                {% include 'player/card.html.twig' with { 'card': user.location.first_card } %}
+            </div>
+        {% else %}
+            <div class="alert alert-info">
+                <a href="{{ path('app_pick_card') }}" class="btn btn-primary">Pick Your Card</a>
+            </div>
+        {% endif %}
+    {% elseif user.location and not user.location.isVerified %}
+        <div class="alert alert-warning">
+            <img class="me-2" src="{{ user.location.CardStop.logo }}" style="height: 50px; width: auto;"/>
+            Your check-in at {{ user.location.CardStop.card_stop_name }} is pending verification. Please wait for a staff member to verify your check-in.
+        </div>
+    {% else %}
+        <div class="alert alert-info">
+            You are not currently checked in at any location.
+            Please <a href="{{ path('app_check_in') }}">Check In</a> at a card stop to participate in the Poker Run.
+        </div>
+    {% endif %}
+
+{% endblock %}
