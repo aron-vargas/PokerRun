@@ -4,6 +4,9 @@ namespace App\Controller\Admin;
 
 use App\Entity\User;
 use App\Entity\Role;
+use App\Entity\CardStop;
+use App\Entity\PlayerLocation;
+use App\Entity\PokerHand;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
@@ -52,8 +55,11 @@ class DashboardController extends AbstractDashboardController
     public function configureMenuItems(): iterable
     {
         yield MenuItem::linkToDashboard('Dashboard', 'fa fa-dashboard');
-        yield MenuItem::linkTo('Users', 'fa fa-users', User::class);
+        yield MenuItem::linkTo('Users/Players', 'fa fa-users', User::class);
         yield MenuItem::linkTo('Roles', 'fa fa-groups', Role::class);
+        yield MenuItem::linkTo('Card Stops', 'fa fa-building', CardStop::class);
+        yield MenuItem::linkTo('Player Stops', 'fa fa-map-marker', PlayerLocation::class);
+        yield MenuItem::linkTo('Poker Hands', 'fa fa-map-marker', PokerHand::class);
         // yield MenuItem::linkTo(SomeCrudController::class, 'The Label', 'fas fa-list');
     }
 

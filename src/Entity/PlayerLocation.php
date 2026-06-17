@@ -35,7 +35,8 @@ class PlayerLocation
     #[ORM\Column(nullable: true)]
     private ?\DateTime $verified_on = null;
 
-    #[ORM\ManyToOne]
+    #[ORM\OneToOne(cascade: ['persist', 'remove'])]
+    #[ORM\JoinColumn(name: 'verified_by', nullable: true)]
     private ?User $verified_by = null;
 
     public function reset(): PlayerLocation

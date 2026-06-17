@@ -19,7 +19,7 @@ class CardStop
     #[ORM\Column(length: 255)]
     private ?string $card_stop_name = null;
 
-    #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 8, nullable: true)]
+    #[ORM\Column(type: Types::DECIMAL, precision: 11, scale: 9, nullable: true)]
     private ?string $longitude = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 8, nullable: true)]

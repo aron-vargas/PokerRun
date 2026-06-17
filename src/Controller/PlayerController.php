@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\User;
 use App\Entity\CardStop;
 use App\Entity\PlayerLocation;
+use App\Form\CheckinFormType;
 use App\Message\PlayerMessage;
 use App\DataFixtures\PlayerAction;
 use Doctrine\ORM\EntityManagerInterface;
@@ -38,31 +39,26 @@ final class PlayerController extends AbstractController
         $user = $this->getUser();
         $new_location = new PlayerLocation();
         $new_location->setPlayer($user);
+        $new_location->setCardStop($cardStop);
+        $new_location->setCheckinTime(new \DateTime());
 
         $twig = 'home/check_in.html.twig';
-        $form = $this->createForm(CheckInFormType::class, $user, $new_location, $cardStop);
+        $form = $this->createForm(CheckInFormType::class, $new_location);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid())
         {
-            $new_location->setCardStop($cardStop);
-            $new_location->setCheckinTime(new \DateTime());
-    
+            // Save location
+            $entityManager->persist($new_location);
+            $user->setLocation($new_location);
+            $entityManager->persist($user);
+            $entityManager->flush();
+
             // Send message to queue for check in
             $this->messageBus->dispatch(new PlayerMessage($user->getEmail(), $user->getFirstName(), $user->getLastName(), PlayerAction::$CheckIn));
 
             $twig = 'home/index.html.twig';
         }
-        else
-        {
-            // If the form is not submitted or not valid, we can still set the card stop and check-in time for the user
-            $new_location->setCardStop($cardStop);
-        }
-
-        $entityManager->persist($new_location);
-        $user->setLocation($new_location);
-        $entityManager->persist($user);
-        $entityManager->flush();
 
         return $this->render($twig, [
             'controller_name' => 'PlayerController',
@@ -74,12 +70,7 @@ final class PlayerController extends AbstractController
     {
         /** @var User $user */
         $user = $this->getUser();
-        $new_location = new PlayerLocation();
-        $new_location->setPlayer($user);
-        $entityManager->persist($new_location);
-        //$entityManager->flush();
-
-        $user->setLocation($new_location);
+        $user->setLocation(null);
         $entityManager->persist($user);
         $entityManager->flush();
 

@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Entity\Role;
 use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -30,10 +31,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $lastName = null;
 
     /**
-     * @var list<string> The user roles
+     * @var Collection<int, Role>
      */
-    #[ORM\Column]
-    private array $roles = [];
+    #[ORM\ManyToMany(targetEntity: Role::class, inversedBy: "users")]
+    private Collection $roles;
 
     /**
      * @var string The hashed password
@@ -128,17 +129,32 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         $roles = $this->roles;
         // guarantee every user at least has ROLE_USER
-        $roles[] = 'ROLE_USER';
+        if (!in_array('ROLE_USER', $roles->toArray(), true)) 
+        {
+            $roles->add('ROLE_USER');
+        }
 
-        return array_unique($roles);
+        return $roles->toArray();
     }
 
     /**
-     * @param list<string> $roles
+     * @param Role $role
      */
-    public function setRoles(array $roles): static
+    public function addRole(Role $role): static
     {
-        $this->roles = $roles;
+        if (!$this->roles->contains($role)) {
+            $this->roles->add($role);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param Role $role
+     */
+    public function removeRole(Role $role): static
+    {
+        $this->roles->removeElement($role);
 
         return $this;
     }
@@ -276,7 +292,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->location;
     }
 
-    public function setLocation(PlayerLocation $location): static
+    public function setLocation(?PlayerLocation $location): static
     {
         // set the owning side of the relation if necessary
         if ($location->getPlayer() !== $this) {
