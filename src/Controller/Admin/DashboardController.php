@@ -44,6 +44,11 @@ class DashboardController extends AbstractDashboardController
         //
         // return $this->render('some/path/my-dashboard.html.twig');
         return $this->render('admin/index.html.twig');
+
+        $routeBuilder = $this->container->get(AdminUrlGenerator::class);
++       $url = $routeBuilder->setController(UserCrudController::class)->generateUrl();
+
+        return $this->redirect($url);
     }
 
     public function configureDashboard(): Dashboard
@@ -55,11 +60,11 @@ class DashboardController extends AbstractDashboardController
     public function configureMenuItems(): iterable
     {
         yield MenuItem::linkToDashboard('Dashboard', 'fa fa-dashboard');
-        yield MenuItem::linkTo('Users/Players', 'fa fa-users', User::class);
-        yield MenuItem::linkTo('Roles', 'fa fa-groups', Role::class);
-        yield MenuItem::linkTo('Card Stops', 'fa fa-building', CardStop::class);
-        yield MenuItem::linkTo('Player Stops', 'fa fa-map-marker', PlayerLocation::class);
-        yield MenuItem::linkTo('Poker Hands', 'fa fa-map-marker', PokerHand::class);
+        yield MenuItem::linkTo(UserCrudController::class,'Users', 'fa fa-users')->setAction('index');
+       // yield MenuItem::linkTo(RoleCrudController::class,'Roles', 'fa fa-circle-user')->setAction('index');
+        yield MenuItem::linkTo(CardStopCrudController::class,'Card Stops', 'fa fa-building')->setAction('index');
+        yield MenuItem::linkTo(PlayerLocationCrudController::class,'Player Stops', 'fa fa-map-marker')->setAction('index');
+        yield MenuItem::linkTo(PokerHandCrudController::class,'Poker Hands', 'fa fa-cards')->setAction('index');
         // yield MenuItem::linkTo(SomeCrudController::class, 'The Label', 'fas fa-list');
     }
 

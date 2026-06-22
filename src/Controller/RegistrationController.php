@@ -40,6 +40,7 @@ class RegistrationController extends AbstractController {
             $user->setPassword($userPasswordHasher->hashPassword($user, $plainPassword));
             $user->setIsVerified(false);
             $user->setActive(true);
+            $user->setRoles(['ROLE_USER','ROLE_PLAYER']);
             //$user->setCreatedOn(new \DateTime());
             //$user->setUpdatedOn(new \DateTime());
 

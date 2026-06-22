@@ -30,11 +30,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 180)]
     private ?string $lastName = null;
 
-    /**
-     * @var Collection<int, Role>
-     */
-    #[ORM\ManyToMany(targetEntity: Role::class, inversedBy: "users")]
-    private Collection $roles;
+    #[ORM\Column(type: 'json')]
+    private array $roles = [];
 
     /**
      * @var string The hashed password
@@ -46,7 +43,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private bool $isVerified = false;
 
     #[ORM\Column]
-    private ?bool $active = null;
+    private ?bool $active = true;
 
     #[ORM\Column(length: 1024, nullable: true)]
     private ?string $avatar = null;
@@ -128,33 +125,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function getRoles(): array
     {
         $roles = $this->roles;
+
         // guarantee every user at least has ROLE_USER
-        if (!in_array('ROLE_USER', $roles->toArray(), true)) 
-        {
-            $roles->add('ROLE_USER');
+        if (empty($roles)) {
+            $roles[] = 'ROLE_USER';
         }
 
-        return $roles->toArray();
+        return array_unique($roles);
     }
 
-    /**
-     * @param Role $role
-     */
-    public function addRole(Role $role): static
+    public function setRoles(array $roles): self
     {
-        if (!$this->roles->contains($role)) {
-            $this->roles->add($role);
-        }
-
-        return $this;
-    }
-
-    /**
-     * @param Role $role
-     */
-    public function removeRole(Role $role): static
-    {
-        $this->roles->removeElement($role);
+        $this->roles = $roles;
 
         return $this;
     }
@@ -235,24 +217,24 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function setCardStop(?CardStop $cardStop): static
     {
-        $this->cardStop = $cardStop;
+        $this->cardStop = $cardStop ?? null;
 
         return $this;
     }
 
     public function getPokerHand(): ?PokerHand
     {
-        return $this->pokerHand;
+        return $this->pokerHand ;
     }
 
-    public function setPokerHand(PokerHand $pokerHand): static
+    public function setPokerHand(?PokerHand $pokerHand): static
     {
         // set the owning side of the relation if necessary
-        if ($pokerHand->getPlayer() !== $this) {
+        if ($pokerHand && $pokerHand->getPlayer() !== $this) {
             $pokerHand->setPlayer($this);
         }
 
-        $this->pokerHand = $pokerHand;
+        $this->pokerHand = $pokerHand ?? null;
 
         return $this;
     }

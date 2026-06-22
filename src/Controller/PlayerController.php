@@ -5,7 +5,7 @@ namespace App\Controller;
 use App\Entity\User;
 use App\Entity\CardStop;
 use App\Entity\PlayerLocation;
-use App\Form\CheckinFormType;
+use App\Form\CheckInFormType;
 use App\Message\PlayerMessage;
 use App\DataFixtures\PlayerAction;
 use Doctrine\ORM\EntityManagerInterface;
@@ -28,9 +28,16 @@ final class PlayerController extends AbstractController
             'controller_name' => 'PlayerController',
         ]);
     }
+    #[Route('/profile', name: 'app_profile_show')]
+    public function profile(): Response
+    {
+        return $this->render('home/player.html.twig', [
+            'controller_name' => 'PlayerController',
+        ]);
+    }
 
     #[Route('/check-in', name: 'app_check_in')]
-    public function checkIn(Request $request, CardStop $cardStop, EntityManagerInterface $entityManager): Response
+    public function checkIn(Request $request, ?CardStop $cardStop, EntityManagerInterface $entityManager): Response
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
 
@@ -61,6 +68,7 @@ final class PlayerController extends AbstractController
         }
 
         return $this->render($twig, [
+            'form' => $form->createView(),
             'controller_name' => 'PlayerController',
         ]);
     }

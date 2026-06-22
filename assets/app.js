@@ -7,4 +7,8 @@ import './stimulus_bootstrap.js';
  */
 import './styles/app.css';
 
+// Add Bootstrap's JavaScript and CSS via npm packages.
+import 'bootstrap';
+import 'bootstrap/dist/css/bootstrap.min.css';
+
 console.log('This log comes from assets/app.js - welcome to AssetMapper! 🎉');

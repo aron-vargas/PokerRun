@@ -20,6 +20,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextEditorField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\ChoiceField;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -39,8 +40,7 @@ class UserCrudController extends AbstractCrudController
 
     public function configureActions(Actions $actions): Actions
     {
-        return parent::configureActions($actions)
-            ->disable(Action::DETAIL);
+        return parent::configureActions($actions);
     }
 
     public function configureFields(string $pageName): iterable
@@ -50,10 +50,8 @@ class UserCrudController extends AbstractCrudController
         yield TextField::new('firstName');
         yield TextField::new('lastName');
         yield TextField::new('email');
-        yield BooleanField::new('active')
-            ->onlyOnIndex();
-        yield BooleanField::new('isVerified')
-            ->onlyOnIndex();
+        yield BooleanField::new('active');
+        yield BooleanField::new('isVerified');
         yield DateField::new('createdOn')
             ->onlyOnIndex();
         yield IntegerField::new('createdBy')
@@ -63,51 +61,69 @@ class UserCrudController extends AbstractCrudController
         yield IntegerField::new('modifiedBy')
             ->onlyOnIndex();
 
-        yield AvatarField::new('avatar')
-            ->formatValue(static function ($value, User $user) {
-                return $user->getAvatar();
-            })
-            ->hideOnForm();
-        yield ImageField::new('avatar')
-            ->setBasePath('uploads/avatars')
-            ->setUploadDir('public/avatars/uploads')
-            ->setUploadedFileNamePattern('[slug]-[timestamp].[extension]')
-            ->onlyOnForms();
+        //yield AvatarField::new('avatar')
+        //    ->formatValue(static function ($value, User $user) {
+        //        return $user->getAvatar();
+        //    })
+        //    ->hideOnForm();
+        // yield ImageField::new('avatar')
+        //     ->setBasePath('uploads/avatars')
+        //     ->setUploadDir('public/avatars/uploads')
+        //     ->setUploadedFileNamePattern('[slug]-[timestamp].[extension]')
+        //     ->onlyOnForms();
+        /*
         yield AssociationField::new('roles')
             ->setFormTypeOptions([
                 'by_reference' => false,
                 'multiple' => true,
-                'choice_label' => function ($role) {
-                    return $role;
-                },
+                'choice_label' => 'id',
                 'choices' => $this->doctrine->getRepository(User::class)->findAll(),
             ]);
-
+        */
+            
+        yield ChoiceField::new('roles')
+            ->setChoices([
+                'Super Admin' => 'ROLE_SUPER_ADMIN',
+                'Admin' => 'ROLE_ADMIN',
+                'User' => 'ROLE_USER',
+                'Player' => 'ROLE_PLAYER',
+                'Card Stop' => 'ROLE_CARD_STOP',
+                'Impersonator' => 'ROLE_ALLOWED_TO_SWITCH',
+            ])
+            ->allowMultipleChoices()
+            ->renderAsBadges();
+        /*
+        yield ChoiceField::new('roles')
+            ->setFormType(ChoiceType::class) // Forces standard Symfony ChoiceType behavior
+            ->setFormTypeOptions([
+                'multiple' => true,
+                'expanded' => true,
+                'required' => true,
+                'choices'  => [
+                    'Super Admin' => 'ROLE_SUPER_ADMIN',
+                    'Admin' => 'ROLE_ADMIN',
+                    'User' => 'ROLE_USER',
+                    'Player' => 'ROLE_PLAYER',
+                    'Card Stop' => 'ROLE_CARD_STOP',
+                    'Impersonator' => 'ROLE_ALLOWED_TO_SWITCH',
+                ],
+            ]);
+            */
         yield AssociationField::new('cardStop')
             ->setFormTypeOptions([
                 'by_reference' => false,
                 'multiple' => false,
-                'choice_label' => function ($cardStop) {
-                    return $cardStop->getCardStopName();
-                },
+                'choice_label' => 'id',
+                'required' => false,
                 'choices' => $this->doctrine->getRepository(CardStop::class)->findAll(),
             ]);
         yield AssociationField::new('pokerHand')
             ->setFormTypeOptions([
                 'by_reference' => false,
                 'multiple' => false,
-                'choice_label' => function ($pokerHand) {
-                    return $pokerHand->getId();
-                },
+                'choice_label' => 'id',
+                'required' => false,
                 'choices' => $this->doctrine->getRepository(PokerHand::class)->findAll(),
             ]);
-        //$roles = ['SUPER_ADMIN', 'ADMIN', 'CARD_STOP', 'PLAYER'];
-        //yield ArrayField::new('roles')
-        //    ->setFormType(ChoiceType::class)
-        //    ->setFormTypeOptions([
-        //        'choices' => array_combine($roles, $roles),
-        //        'multiple' => true,
-         //       'expanded' => true,
-         //   ]);
     }
 }

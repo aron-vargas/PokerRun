@@ -1,0 +1,184 @@
+{% extends "base.html.twig" %}
+
+{% block title %}User Profile - {{ app.user.firstName }} {{ app.user.lastName }}{% endblock %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <style>
+        .profile-card {
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .profile-avatar {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            border: 5px solid white;
+            object-fit: cover;
+            margin-bottom: 20px;
+        }
+
+        .profile-info {
+            background: white;
+            color: #333;
+            padding: 30px;
+        }
+
+        .profile-name {
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .profile-email {
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 20px;
+        }
+
+        .profile-status {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .status-active {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .status-inactive {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        .status-verified {
+            background-color: #007bff;
+            color: white;
+        }
+
+        .profile-roles {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+
+        .role-badge {
+            display: inline-block;
+            background-color: #667eea;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            margin-right: 8px;
+            margin-bottom: 8px;
+            font-size: 13px;
+        }
+
+        .profile-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 40px;
+            text-align: center;
+            color: white;
+        }
+
+        .profile-actions {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .profile-actions a {
+            flex: 1;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-6">
+                <!-- Profile Card -->
+                <div class="card profile-card">
+                    <!-- Header with gradient -->
+                    <div class="profile-header">
+                        <!-- Avatar -->
+                        {% if app.user.avatar %}
+                            <img src="{{ app.user.avatar }}" alt="Profile" class="profile-avatar">
+                        {% else %}
+                            <div class="profile-avatar" style="background-color: rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; font-size: 60px;">
+                                👤
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- User Information -->
+                    <div class="profile-info">
+                        <!-- Name -->
+                        <div class="profile-name">
+                            {{ app.user.firstName }} {{ app.user.lastName }}
+                        </div>
+
+                        <!-- Email -->
+                        <div class="profile-email">
+                            <i class="bi bi-envelope"></i>
+                            {{ app.user.email }}
+                        </div>
+
+                        <!-- Status Badges -->
+                        <div class="profile-status">
+                            {% if app.user.active %}
+                                <span class="status-badge status-active">✓ Active</span>
+                            {% else %}
+                                <span class="status-badge status-inactive">Inactive</span>
+                            {% endif %}
+
+                            {% if app.user.isVerified %}
+                                <span class="status-badge status-verified">✓ Verified</span>
+                            {% else %}
+                                <span class="status-badge status-inactive">Not Verified</span>
+                            {% endif %}
+                        </div>
+
+                        <!-- Roles -->
+                        {% if app.user.roles %}
+                            <div class="profile-roles">
+                                <strong>Roles:</strong><br>
+                                {% for role in app.user.roles %}
+                                    <span class="role-badge">{{ role.name }}</span>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+
+                        <!-- Action Buttons -->
+                        <div class="profile-actions">
+                            <a href="{{ path('app_home') }}" class="btn btn-outline-primary">
+                                ← Back to Home
+                            </a>
+                            <a href="#" class="btn btn-primary">
+                                Edit Profile
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- User ID Info -->
+                <div class="alert alert-secondary mt-3" role="alert">
+                    <small><strong>User ID:</strong> #{{ app.user.id }}</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+{% endblock %}

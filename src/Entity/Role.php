@@ -55,4 +55,10 @@ class Role
 
         return $this;
     }
+
+    // Used for display in the admin interface, and for debugging:
+    public function __toString(): string
+    {
+        return $this->role_name ?? '';
+    }
 }
