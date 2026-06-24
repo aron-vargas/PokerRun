@@ -2,12 +2,15 @@
 
 namespace App\Form;
 
+use App\Entity\User;
 use App\Entity\CardStop;
 use App\Entity\PlayerLocation;
 use App\Repository\CardStopRepository;
+use Symfony\Component\Asset\Packages;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Bundle\SecurityBundle\Security;
@@ -16,7 +19,7 @@ use Symfony\Component\Form\FormEvents;
 
 class CheckInFormType extends AbstractType
 {
-    public function __construct(private Security $security) 
+    public function __construct(private Security $security, private Packages $assetManager) 
     {
 
     }
@@ -44,9 +47,28 @@ class CheckInFormType extends AbstractType
 
             $form = $event->getForm();
 
+            $genericImageSrc = $this->assetManager->getUrl('images/Fernley.png');
+
             $formOptions = [
                 'class' => CardStop::class,
-                'choice_label' => 'card_stop_name',
+                // render as radio buttons
+                'expanded' => true,
+                'multiple' => false,
+                // allow HTML inside the label (we build an <img> + name)
+                'label_html' => true,
+                'choice_label' => function (CardStop $cardStop) use ($genericImageSrc) {
+                    $name = htmlspecialchars((string) $cardStop->getCardStopName(), ENT_QUOTES, 'UTF-8');
+                    $logo = $cardStop->getLogo();
+
+                    if ($logo) {
+                        $src = $logo;
+                    } else {
+                        // fallback generic building image from public assets
+                        $src = $genericImageSrc;
+                    }
+
+                    return sprintf('<img src="%s" alt="%s logo" style="height:24px;width:24px;object-fit:cover;margin-right:8px;border-radius:4px;vertical-align:middle;">%s', $src, $name, $name);
+                },
                 'query_builder' => function (CardStopRepository $repo) use ($user) {
                     // call a method on your repository that returns the query builder
                     return $repo->findAllUnvisitedCardStopsForPlayerQB($user->getId());
@@ -56,6 +78,10 @@ class CheckInFormType extends AbstractType
             // create the field, this is similar the $builder->add()
             // field name, field type, field options
             $form->add('CardStop', EntityType::class, $formOptions);
+            $form->add('save', SubmitType::class, [
+                'label' => 'Check It', // Text displayed on the button
+                'attr' => ['class' => 'btn btn-primary'] // Optional: add CSS classes
+            ]);
         });
     }
 

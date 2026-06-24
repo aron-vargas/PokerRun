@@ -22,11 +22,11 @@ class PokerHandRepository extends ServiceEntityRepository
         $hands = $this->createQueryBuilder('h')
             ->addSelect('p, c1, c2, c3, c4, c5')
             ->join('h.Player', 'p')
-            ->leftJoin('h.card_one', 'c1')
-            ->leftJoin('h.card_two', 'c2')
-            ->leftJoin('h.card_three', 'c3')
-            ->leftJoin('h.card_four', 'c4')
-            ->leftJoin('h.card_five', 'c5')
+            ->leftJoin('h.cardOne', 'c1')
+            ->leftJoin('h.cardTwo', 'c2')
+            ->leftJoin('h.cardThree', 'c3')
+            ->leftJoin('h.cardFour', 'c4')
+            ->leftJoin('h.cardFive', 'c5')
             ->getQuery()
             ->getResult();
 

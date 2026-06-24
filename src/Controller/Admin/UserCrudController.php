@@ -6,6 +6,8 @@ use App\Entity\User;
 use App\Entity\CardStop;
 use App\Entity\Role;
 use App\Entity\PokerHand;
+use App\Repository\CardStopRepository;
+use Symfony\Component\Asset\Packages;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
@@ -25,20 +27,24 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
 use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\ORM\QueryBuilder;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class UserCrudController extends AbstractCrudController
 {
-    private ManagerRegistry $doctrine;
+    //private ManagerRegistry $doctrine;
     private UserPasswordHasherInterface $passwordHasher;
+    //private CardStopRepository $cardStopRepository;
 
 
-    public function __construct(UserPasswordHasherInterface $passwordHasher, ManagerRegistry $doctrine)
+    public function __construct(UserPasswordHasherInterface $passwordHasher, private Packages $assetManager)
     {
         $this->passwordHasher = $passwordHasher;
-        $this->doctrine = $doctrine;
+        //$this->doctrine = $doctrine;
+        $this->assetManager = $assetManager;
+        //$this->cardStopRepository = $cardStopRepository;
     }
 
     public static function getEntityFqcn(): string
@@ -63,6 +69,8 @@ class UserCrudController extends AbstractCrudController
 
     public function configureFields(string $pageName): iterable
     {
+        $genericImageSrc = $this->assetManager->getUrl('images/Fernley.png');
+
         yield IdField::new('id')
             ->onlyOnIndex();
         yield TextField::new('firstName');
@@ -98,15 +106,6 @@ class UserCrudController extends AbstractCrudController
         //     ->setUploadDir('public/avatars/uploads')
         //     ->setUploadedFileNamePattern('[slug]-[timestamp].[extension]')
         //     ->onlyOnForms();
-        /*
-        yield AssociationField::new('roles')
-            ->setFormTypeOptions([
-                'by_reference' => false,
-                'multiple' => true,
-                'choice_label' => 'id',
-                'choices' => $this->doctrine->getRepository(User::class)->findAll(),
-            ]);
-        */
             
         yield ChoiceField::new('roles')
             ->setChoices([
@@ -119,39 +118,23 @@ class UserCrudController extends AbstractCrudController
             ])
             ->allowMultipleChoices()
             ->renderAsBadges();
-        /*
-        yield ChoiceField::new('roles')
-            ->setFormType(ChoiceType::class) // Forces standard Symfony ChoiceType behavior
-            ->setFormTypeOptions([
-                'multiple' => true,
-                'expanded' => true,
-                'required' => true,
-                'choices'  => [
-                    'Super Admin' => 'ROLE_SUPER_ADMIN',
-                    'Admin' => 'ROLE_ADMIN',
-                    'User' => 'ROLE_USER',
-                    'Player' => 'ROLE_PLAYER',
-                    'Card Stop' => 'ROLE_CARD_STOP',
-                    'Impersonator' => 'ROLE_ALLOWED_TO_SWITCH',
-                ],
-            ]);
-            */
+
         yield AssociationField::new('cardStop')
             ->setFormTypeOptions([
-                'by_reference' => false,
-                'multiple' => false,
-                'choice_label' => 'id',
-                'required' => false,
-                'choices' => $this->doctrine->getRepository(CardStop::class)->findAll(),
+                'class' => CardStop::class,
+                'choice_label' => 'card_stop_name',
             ]);
-        yield AssociationField::new('pokerHand')
-            ->setFormTypeOptions([
-                'by_reference' => false,
-                'multiple' => false,
-                'choice_label' => 'id',
-                'required' => false,
-                'choices' => $this->doctrine->getRepository(PokerHand::class)->findAll(),
-            ]);
+          
+
+       // return $qb;
+        // yield AssociationField::new('pokerHand')
+        //     ->setFormTypeOptions([
+        //         'by_reference' => false,
+        //         'multiple' => false,
+        //         'choice_label' => 'id',
+        //         'required' => false,
+        //         'choices' => $this->doctrine->getRepository(PokerHand::class)->findAll(),
+        //     ]);
     }
 
     public function updateEntity(EntityManagerInterface $entityManager, $entityInstance): void

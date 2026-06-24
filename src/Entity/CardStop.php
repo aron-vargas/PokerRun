@@ -128,4 +128,9 @@ class CardStop
 
         return $this;
     }
+
+    public function __toString(): string
+    {
+        return $this->card_stop_name ?? '';
+    }
 }

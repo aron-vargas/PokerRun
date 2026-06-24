@@ -26,10 +26,10 @@ class LoginController extends AbstractController
             $logger->info("Redirecting to Admin\DashboardController::index for user: " . $user->getEmail());
             return $this->redirectToRoute('admin');
         }
-        else if ($this->isGranted('CARD_STOP'))
+        else if ($this->isGranted('ROLE_CARD_STOP'))
         {
-            $logger->info("Forwarding to CardStopController::index for user: " . $user->getEmail());
-            return $this->forward('App\Controller\CardStopController::index');
+            $logger->info("Redirecting to CardStop\CardStopDashboardController::index for user: " . $user->getEmail());
+            return $this->redirectToRoute('cardstop');
         }
         else
         {

@@ -3,7 +3,8 @@
 namespace App\Repository;
 
 use App\Entity\CardStop;
-use App\Entity\PlayerLocation;  
+use App\Entity\PlayerLocation;
+use App\Repository\UserRepository;  
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\ORM\QueryBuilder;

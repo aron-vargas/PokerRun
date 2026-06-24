@@ -3,6 +3,8 @@
 namespace App\Repository;
 
 use App\Entity\PlayerLocation;
+use App\Repository\UserRepository;
+use DateTime;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -11,7 +13,7 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class PlayerLocationRepository extends ServiceEntityRepository
 {
-    public function __construct(ManagerRegistry $registry)
+    public function __construct(ManagerRegistry $registry, private UserRepository $userRepo)
     {
         parent::__construct($registry, PlayerLocation::class);
     }
@@ -33,20 +35,33 @@ class PlayerLocationRepository extends ServiceEntityRepository
     {
         return (int) $this->createQueryBuilder('pl')
             ->select('COUNT(pl.id)')
-            ->andWhere('pl.checkin_time IS NOT NULL')
+            ->andWhere('pl.checkinTime IS NOT NULL')
             ->andWhere('pl.isVerified = 1')
             ->getQuery()
             ->getSingleScalarResult();
     }
 
+    /**
+    * @param integer $value Location ID
+    * @return PlayerLocation Returns one objects
+    */
+    public function findOneById($value): ?PlayerLocation
+    {
+        return $this->createQueryBuilder('pl')
+            ->andWhere('pl.id = :val')
+            ->setParameter('val', $value)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+
     public function findRecentActivity(int $limit = 10): array
     {
         $rows = $this->createQueryBuilder('pl')
-            ->select('u.firstName AS firstName', 'u.lastName AS lastName', 'pl.checkin_time AS checkinTime', 'cs.card_stop_name AS location')
+            ->select('u.firstName AS firstName', 'u.lastName AS lastName', 'pl.checkinTime AS checkinTime', 'cs.card_stop_name AS location')
             ->join('pl.Player', 'u')
             ->leftJoin('pl.CardStop', 'cs')
-            ->andWhere('pl.checkin_time IS NOT NULL')
-            ->orderBy('pl.checkin_time', 'DESC')
+            ->andWhere('pl.checkinTime IS NOT NULL')
+            ->orderBy('pl.checkinTime', 'DESC')
             ->setMaxResults($limit)
             ->getQuery()
             ->getArrayResult();
@@ -60,28 +75,39 @@ class PlayerLocationRepository extends ServiceEntityRepository
         }, $rows);
     }
 
-    //    /**
-    //     * @return PlayerLocation[] Returns an array of PlayerLocation objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('p')
-    //            ->andWhere('p.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('p.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
+    public function findCardStopUnverified(int $card_stop_id, int $limit=100): array
+    {
+        $rows = $this->createQueryBuilder('pl')
+            ->select('pl.id AS id', 'u.id AS player_id', 'u.firstName AS firstName', 'u.lastName AS lastName', 'pl.checkinTime AS checkinTime', 'cs.card_stop_name AS location')
+            ->join('pl.Player', 'u')
+            ->leftJoin('pl.CardStop', 'cs')
+            ->andWhere('pl.isVerified = 0')
+            ->andWhere('pl.cardStop = :stop')
+            ->setParameter('stop', $card_stop_id)
+            ->orderBy('pl.checkinTime', 'DESC')
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getArrayResult();
 
-    //    public function findOneBySomeField($value): ?PlayerLocation
-    //    {
-    //        return $this->createQueryBuilder('p')
-    //            ->andWhere('p.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
+        return $rows;
+    }
+
+    public function removeLocation(PlayerLocation $entity, bool $flush = true): void
+    {
+        $this->getEntityManager()->remove($entity);
+
+        if ($flush) {
+            $this->getEntityManager()->flush();
+        }
+    }
+
+    public function verifyLocation(PlayerLocation $entity, int $user_id, bool $flush = true): void
+    {
+        $entity->setIsVerified(true);
+        $entity->setVerifiedOn(new DateTime());
+        $entity->setVerifiedBy($this->userRepo->find($user_id));
+
+        if ($flush)
+            $this->getEntityManager()->flush();
+    }
 }

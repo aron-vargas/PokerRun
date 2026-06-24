@@ -80,7 +80,7 @@ class PlayerLocationCrudController extends AbstractCrudController
                 },
                 'choices' => $extraCardChoices,
             ]);
-        yield TextField::new('checkin_time')
+        yield TextField::new('checkinTime')
             ->onlyOnIndex();;
         yield DateField::new('verified_on')
             ->onlyOnIndex();;

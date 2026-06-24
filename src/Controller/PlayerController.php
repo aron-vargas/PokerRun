@@ -8,6 +8,7 @@ use App\Entity\PlayerLocation;
 use App\Form\CheckInFormType;
 use App\Message\PlayerMessage;
 use App\DataFixtures\PlayerAction;
+use App\Repository\CardStopRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -18,7 +19,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Attribute\AdminRoute;
 
 final class PlayerController extends AbstractController
 {
-    public function __construct(private MessageBusInterface $messageBus)
+    public function __construct(private MessageBusInterface $messageBus, private CardStopRepository $cardStopRepository)
     {
     }
 
@@ -30,6 +31,7 @@ final class PlayerController extends AbstractController
         ]);
     }
 
+    #[Route('/player/profile', name: 'app_profile_show')]
     #[AdminRoute('/profile', name: 'app_profile_show')]
     public function profile(): Response
     {
@@ -38,6 +40,7 @@ final class PlayerController extends AbstractController
         ]);
     }
 
+    #[Route('/player/check-in', name: 'app_check_in')]
     #[AdminRoute('/check-in', name: 'app_check_in')]
     public function checkIn(Request $request, ?CardStop $cardStop, EntityManagerInterface $entityManager): Response
     {

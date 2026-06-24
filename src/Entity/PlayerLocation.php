@@ -29,7 +29,7 @@ class PlayerLocation
     #[ORM\OneToOne(inversedBy: 'location', cascade: ['persist', 'remove'])]
     private ?PlayingCard $extraCard = null;
 
-    #[ORM\Column(nullable: true)]
+    #[ORM\Column(name: 'checkin_time',nullable: true)]
     private ?\DateTime $checkinTime = null;
 
     #[ORM\Column(name: 'verified_on', nullable: true)]
