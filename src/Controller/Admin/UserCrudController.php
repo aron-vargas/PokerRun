@@ -22,14 +22,22 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ChoiceField;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\PasswordType;
+use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
 use Doctrine\Persistence\ManagerRegistry;
+
+use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class UserCrudController extends AbstractCrudController
 {
     private ManagerRegistry $doctrine;
+    private UserPasswordHasherInterface $passwordHasher;
 
-    public function __construct(ManagerRegistry $doctrine)
+
+    public function __construct(UserPasswordHasherInterface $passwordHasher, ManagerRegistry $doctrine)
     {
+        $this->passwordHasher = $passwordHasher;
         $this->doctrine = $doctrine;
     }
 
@@ -40,6 +48,16 @@ class UserCrudController extends AbstractCrudController
 
     public function configureActions(Actions $actions): Actions
     {
+        // Create the custom Impersonate action
+        $impersonateAction = Action::new('impersonateUser', 'Impersonate', 'fa fa-user-secret')
+            ->linkToUrl(function (User $user) {
+                // Adjust 'email' to whatever identifier your user provider uses (e.g., getUsername)
+                return $this->generateUrl('admin', [
+                    '_switch_user' => $user->getEmail(),
+                ]);
+            });
+        $actions->add(Crud::PAGE_INDEX, $impersonateAction);
+
         return parent::configureActions($actions);
     }
 
@@ -50,6 +68,15 @@ class UserCrudController extends AbstractCrudController
         yield TextField::new('firstName');
         yield TextField::new('lastName');
         yield TextField::new('email');
+        yield TextField::new('plainPassword', 'Password')
+            ->onlyOnForms()
+            ->setFormType(RepeatedType::class)
+            ->setFormTypeOptions([
+                'type' => PasswordType::class,
+                'first_options' => ['label' => 'New Password'],
+                'second_options' => ['label' => 'Repeat Password'],
+                'required' => false, // Makes it optional!
+            ]);
         yield BooleanField::new('active');
         yield BooleanField::new('isVerified');
         yield DateField::new('createdOn')
@@ -125,5 +152,28 @@ class UserCrudController extends AbstractCrudController
                 'required' => false,
                 'choices' => $this->doctrine->getRepository(PokerHand::class)->findAll(),
             ]);
+    }
+
+    public function updateEntity(EntityManagerInterface $entityManager, $entityInstance): void
+    {
+        $this->encodePassword($entityInstance);
+        parent::updateEntity($entityManager, $entityInstance);
+    }
+
+    public function persistEntity(EntityManagerInterface $entityManager, $entityInstance): void
+    {
+        $this->encodePassword($entityInstance);
+        parent::persistEntity($entityManager, $entityInstance);
+    }
+
+    private function encodePassword(User $user): void
+    {
+        if ($user->getPlainPassword()) {
+            $user->setPassword(
+                $this->passwordHasher->hashPassword($user, $user->getPlainPassword())
+            );
+            // Important: erase credentials to clear plaintext from memory
+            $user->setPlainPassword(null); 
+        }
     }
 }

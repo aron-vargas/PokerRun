@@ -24,15 +24,15 @@ class PlayerLocation
     private ?bool $isVerified = null;
 
     #[ORM\OneToOne(inversedBy: 'location', cascade: ['persist', 'remove'])]
-    private ?PlayingCard $first_card = null;
+    private ?PlayingCard $firstCard = null;
 
-    #[ORM\OneToOne(cascade: ['persist', 'remove'])]
-    private ?PlayingCard $extra_card = null;
-
-    #[ORM\Column(nullable: true)]
-    private ?\DateTime $checkin_time = null;
+    #[ORM\OneToOne(inversedBy: 'location', cascade: ['persist', 'remove'])]
+    private ?PlayingCard $extraCard = null;
 
     #[ORM\Column(nullable: true)]
+    private ?\DateTime $checkinTime = null;
+
+    #[ORM\Column(name: 'verified_on', nullable: true)]
     private ?\DateTime $verified_on = null;
 
     #[ORM\OneToOne(cascade: ['persist', 'remove'])]
@@ -43,9 +43,9 @@ class PlayerLocation
     {
         $this->CardStop = null;
         $this->isVerified = false;
-        $this->first_card = null;
-        $this->extra_card = null;
-        $this->checkin_time = null;
+        $this->firstCard = null;
+        $this->extraCard = null;
+        $this->checkinTime = null;
         $this->verified_on = null;
         $this->verified_by = null;
         $this->id = null;
@@ -103,36 +103,36 @@ class PlayerLocation
 
     public function getFirstCard(): ?PlayingCard
     {
-        return $this->first_card;
+        return $this->firstCard;
     }
 
-    public function setFirstCard(?PlayingCard $first_card): static
+    public function setFirstCard(?PlayingCard $firstCard): static
     {
-        $this->first_card = $first_card;
+        $this->firstCard = $firstCard;
 
         return $this;
     }
 
     public function getExtraCard(): ?PlayingCard
     {
-        return $this->extra_card;
+        return $this->extraCard;
     }
 
-    public function setExtraCard(?PlayingCard $extra_card): static
+    public function setExtraCard(?PlayingCard $extraCard): static
     {
-        $this->extra_card = $extra_card;
+        $this->extraCard = $extraCard;
 
         return $this;
     }
 
     public function getCheckinTime(): ?\DateTime
     {
-        return $this->checkin_time;
+        return $this->checkinTime;
     }
 
-    public function setCheckinTime(?\DateTime $checkin_time): static
+    public function setCheckinTime(?\DateTime $checkinTime): static
     {
-        $this->checkin_time = $checkin_time;
+        $this->checkinTime = $checkinTime;
 
         return $this;
     }

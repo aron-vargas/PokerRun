@@ -29,6 +29,37 @@ class PlayerLocationRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult();
     }
 
+    public function countCheckIns(): int
+    {
+        return (int) $this->createQueryBuilder('pl')
+            ->select('COUNT(pl.id)')
+            ->andWhere('pl.checkin_time IS NOT NULL')
+            ->andWhere('pl.isVerified = 1')
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
+    public function findRecentActivity(int $limit = 10): array
+    {
+        $rows = $this->createQueryBuilder('pl')
+            ->select('u.firstName AS firstName', 'u.lastName AS lastName', 'pl.checkin_time AS checkinTime', 'cs.card_stop_name AS location')
+            ->join('pl.Player', 'u')
+            ->leftJoin('pl.CardStop', 'cs')
+            ->andWhere('pl.checkin_time IS NOT NULL')
+            ->orderBy('pl.checkin_time', 'DESC')
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getArrayResult();
+
+        return array_map(function (array $row) {
+            return [
+                'playerName' => trim(sprintf('%s %s', $row['firstName'] ?? '', $row['lastName'] ?? '')),
+                'checkInTime' => $row['checkinTime'],
+                'location' => $row['location'] ?? 'Unknown',
+            ];
+        }, $rows);
+    }
+
     //    /**
     //     * @return PlayerLocation[] Returns an array of PlayerLocation objects
     //     */

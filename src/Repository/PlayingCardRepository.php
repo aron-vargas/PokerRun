@@ -16,6 +16,14 @@ class PlayingCardRepository extends ServiceEntityRepository
         parent::__construct($registry, PlayingCard::class);
     }
 
+    public function countAllCards(): int
+    {
+        return (int) $this->createQueryBuilder('c')
+            ->select('COUNT(c.id)')
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
 //    /**
 //     * @return PlayingCard[] Returns an array of PlayingCard objects
 //     */

@@ -7,6 +7,10 @@ use App\Entity\Role;
 use App\Entity\CardStop;
 use App\Entity\PlayerLocation;
 use App\Entity\PokerHand;
+use App\Repository\PlayerLocationRepository;
+use App\Repository\PlayingCardRepository;
+use App\Repository\PokerHandRepository;
+use App\Repository\UserRepository;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
@@ -24,37 +28,45 @@ use Symfony\Component\Routing\Annotation\Route;
 #[AdminDashboard(routePath: '/admin', routeName: 'admin')]
 class DashboardController extends AbstractDashboardController
 {
+    private PlayerLocationRepository $playerLocationRepository;
+    private PlayingCardRepository $playingCardRepository;
+    private PokerHandRepository $pokerHandRepository;
+    private UserRepository $userRepository;
+
+    public function __construct(
+        PlayerLocationRepository $playerLocationRepository,
+        PlayingCardRepository $playingCardRepository,
+        PokerHandRepository $pokerHandRepository,
+        UserRepository $userRepository
+    ) {
+        $this->playerLocationRepository = $playerLocationRepository;
+        $this->playingCardRepository = $playingCardRepository;
+        $this->pokerHandRepository = $pokerHandRepository;
+        $this->userRepository = $userRepository;
+    }
+
     #[IsGranted('ROLE_ADMIN')]
     public function index(): Response
     {
-        //return parent::index();
+        $totalPlayers = $this->userRepository->countAllUsers();
+        $totalCheckIns = $this->playerLocationRepository->countCheckIns();
+        $totalPokerCards = $this->playingCardRepository->countAllCards();
+        $recentActivities = $this->playerLocationRepository->findRecentActivity(10);
+        $currentPokerHands = $this->pokerHandRepository->findCurrentHighestHands(10);
 
-        // Option 1. You can make your dashboard redirect to some common page of your backend
-        //
-        // return $this->redirectToRoute('admin_user_index');
-
-        // Option 2. You can make your dashboard redirect to different pages depending on the user
-        //
-        // if ('jane' === $this->getUser()->getUsername()) {
-        //     return $this->redirectToRoute('...');
-        // }
-
-        // Option 3. You can render some custom template to display a proper dashboard with widgets, etc.
-        // (tip: it's easier if your template extends from @EasyAdmin/page/content.html.twig)
-        //
-        // return $this->render('some/path/my-dashboard.html.twig');
-        return $this->render('admin/index.html.twig');
-
-        $routeBuilder = $this->container->get(AdminUrlGenerator::class);
-+       $url = $routeBuilder->setController(UserCrudController::class)->generateUrl();
-
-        return $this->redirect($url);
+        return $this->render('admin/index.html.twig', [
+            'totalPlayers' => $totalPlayers,
+            'totalCheckIns' => $totalCheckIns,
+            'totalPokerCards' => $totalPokerCards,
+            'recentActivities' => $recentActivities,
+            'currentPokerHands' => $currentPokerHands,
+        ]);
     }
 
     public function configureDashboard(): Dashboard
     {
         return Dashboard::new()
-            ->setTitle('PokerRun Admin');
+            ->setTitle('Main Street Fernley<br/> PokerRun Admin');
     }
 
     public function configureMenuItems(): iterable
@@ -66,6 +78,8 @@ class DashboardController extends AbstractDashboardController
         yield MenuItem::linkTo(PlayerLocationCrudController::class,'Player Stops', 'fa fa-map-marker')->setAction('index');
         yield MenuItem::linkTo(PokerHandCrudController::class,'Poker Hands', 'fa fa-cards')->setAction('index');
         // yield MenuItem::linkTo(SomeCrudController::class, 'The Label', 'fas fa-list');
+
+        yield MenuItem::linkToExitImpersonation('Exit Impersonation', 'fa fa-sign-out-alt');
     }
 
     public function configureActions(): Actions

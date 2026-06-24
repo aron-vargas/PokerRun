@@ -1,5 +1,153 @@
 {% extends '@EasyAdmin/page/content.html.twig' %}
+
 {% block content %}
-    <h1>Dashboard Overview</h1>
-    <!-- Add custom metrics/charts here -->
+<div class="content">
+    <section class="content-header">
+        <div class="content-header-title">
+            <h1 class='title'>Dashboard Overview</h1>
+        </div>
+    </section>
+    <section class="content-body">
+        <!-- Dashboard Metric Grid Row -->
+        <div class="row g-4 pb-4">
+            <!-- Total Players -->
+            <div class="col-12 col-sm-6 col-xl-3">
+                <div class="card h-100 border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-itemt-center mb-3">
+                        <span class="text-muted fw-medium text-uppercase medium">Total Players</span>
+                        <div class="bg-primary-subtle text-primary rounded px-2 py-1">
+                            <i class="fa fa-people-group fs-5"></i>
+                        </div>
+                    </div>
+                    <h3 class="mb-2 fw-bold">{{ totalPlayers }}</h3>
+                </div>
+                </div>
+            </div>
+            <!-- Total Check-ins -->
+            <div class="col-12 col-sm-6 col-xl-3">
+                <div class="card h-100 border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-itemt-center mb-3">
+                        <span class="text-muted fw-medium text-uppercase medium">Total Check-ins</span>
+                        <div class="bg-primary-subtle text-primary rounded px-2 py-1">
+                            <i class="fa fa-check-circle fs-5"></i>
+                        </div>
+                    </div>
+                    <h3 class="mb-2 fw-bold">{{ totalCheckIns }}</h3>
+                </div>
+                </div>
+            </div>
+            <!-- Total Poker Cards -->
+            <div class="col-12 col-sm-6 col-xl-3">
+                <div class="card h-100 border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-itemt-center mb-3">
+                        <span class="text-muted fw-medium text-uppercase medium">Total Poker Cards</span>
+                        <div class="bg-primary-subtle text-primary rounded px-2 py-1">
+                            <i class="fa fa-card-list fs-5"></i>
+                        </div>
+                    </div>
+                    <h3 class="mb-2 fw-bold">{{ totalPokerCards }}</h3>
+                </div>
+                </div>
+            </div>
+        </div>
+   
+        <h1 class='title'>Recent Player Activity</h1>
+        <table class="table table-striped mb-6">
+            <thead>
+                <tr>
+                    <th>Player Name</th>
+                    <th>Check-in Time</th>
+                    <th>Location</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for activity in recentActivities %}
+                    <tr>
+                        <td>{{ activity.playerName }}</td>
+                        <td>{{ activity.checkInTime|date('Y-m-d H:i:s') }}</td>
+                        <td>{{ activity.location }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+  
+        <h1 class="title pt-4">Current Highest Poker Hands</h1>
+        <table class="table table-striped mb-6">
+            <thead>
+                <tr>
+                    <th>Player Name</th>
+                    <th>Poker Hand</th>
+                    <th>Hand Rank</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for hand in currentPokerHands %}
+                    <tr>
+                        <td>{{ hand.playerName }}</td>
+                        <td>{{ hand.pokerHand }}</td>
+                        <td>{{ hand.handRank }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <h1 class="title pt-4">Poker Walk Rules</h1>
+        <div class="mb-4">
+            <ol>
+                <li>Each Player begins at the Registration Table where they check-in; 
+                get a Scorecard with a map of the Poker Walk Businesses.</li>
+                <li>Players must visit each business to draw a poker card. 
+                Businesses are separated into different zones for each hand. 
+                Participants will have up to four different hands. 
+                Businesses are listed by their respective colored chip correlating to their colored table.</li>
+                <li>One Poker Card is drawn at each business. Drawn cards are to be 
+                laid face up on the table for view. No duplicate cards can be used; 
+                if a duplicate card is drawn, you must draw again. 
+                The Score Card must be filled out and initialed by the business.</li>
+                <li>Players can pick 1-additional card if they purchase an item from the Poker Walk business.</li>
+                <li>All Players must submit their Poker Score Card by 6:30 PM at the 
+                registration table to be considered for the Best Poker Hands.</li>
+                <li>In case of a tie, Players will each draw a card; highest card wins.</li>
+            </ol>
+        </div>
+
+        <h1 class="title">Poker Hand Rankings</h1>
+        <p>In order to determine the best poker hand, the following rankings are used:</p> 
+        <div>
+            <ul>
+                <li>Royal Flush</li>
+                <li>Straight Flush</li>
+                <li>Four of a Kind</li>
+                <li>Full House</li>
+                <li>Flush</li>
+                <li>Straight</li>
+                <li>Three of a Kind</li>
+                <li>Two Pair</li>
+                <li>Pair</li>
+                <li>High Card</li>
+            </ul>
+            <p>(Highest to Lowest)</p>
+        </div>
+        <div>
+            <p>Note: The Ace can be used as either the highest card or the lowest card in a straight. 
+            For example, A-2-3-4-5 is a valid straight, as is 10-J-Q-K-A.</p>
+        </div>
+        <div>
+            <p><strong>Royal Flush:</strong> Sequential cards from Ten to Ace, with all cards of the same suit</p>
+            <p><strong>Straight Flush:</strong> Sequential cards, all cards in the same suit, but not Ace high</p>
+            <p><strong>Four of a Kind:</strong> Four cards of the same rank, e.g. four Aces</p>
+            <p><strong>Full House:</strong> Three cards of same rank plus a pair, e.g. three Aces and two Kings</p>
+            <p><strong>Flush:</strong> Five cards all of the same suit</p>
+            <p><strong>Straight:</strong> Five sequential cards, not of the same suit</p>
+            <p><strong>Three of a Kind:</strong> Three cards of the same rank, e.g. three Aces</p>
+            <p><strong>Two Pair:</strong> Two sets of pairs, e.g. a pair of Aces and a pair of Kings</p>
+            <p><strong>Pair:</strong> Two cards of the same rank, e.g. two Aces</p>
+            <p><strong>High Card:</strong> The highest value card in your hand, 
+            Ace being the highest. 2 being the lowest.</p>
+        </div>
+    </section>
+</div>
 {% endblock %}

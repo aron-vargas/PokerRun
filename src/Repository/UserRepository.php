@@ -33,29 +33,43 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         $this->getEntityManager()->flush();
     }
 
-       /**
-        * @param integer $value User ID
-        * @return User Returns an array of User objects
-        */
-       public function findOneById($value): ?User
-       {
-           return $this->createQueryBuilder('u')
-               ->andWhere('u.id = :val')
-               ->setParameter('val', $value)
-               ->getQuery()
-               ->getOneOrNullResult();
-       }
+    /**
+    * @param integer $value User ID
+    * @return User Returns an array of User objects
+    */
+    public function findOneById($value): ?User
+    {
+        return $this->createQueryBuilder('u')
+            ->andWhere('u.id = :val')
+            ->setParameter('val', $value)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
 
-       /**
-        * @param string $value Email
-        * @return User Returns an array of User objects
-        */
-       public function findOneByEmail($value): ?User
-       {
-           return $this->createQueryBuilder('u')
-               ->andWhere('u.email = :val')
-               ->setParameter('val', $value)
-               ->getQuery()
-               ->getOneOrNullResult();
-       }
+    /**
+    * @param string $value Email
+    * @return User Returns an array of User objects
+    */
+    public function findOneByEmail($value): ?User
+    {
+        return $this->createQueryBuilder('u')
+            ->andWhere('u.email = :val')
+            ->setParameter('val', $value)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+
+    /**
+     * Summary of GetAllUsers
+     */
+    public function countAllUsers(): int
+    {
+        return $this->createQueryBuilder('u')
+            ->select('COUNT(u)')
+            ->andWhere('u.active = :val')
+            ->setParameter('val', true)
+            ->orderBy('u.id', 'ASC')
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
 }

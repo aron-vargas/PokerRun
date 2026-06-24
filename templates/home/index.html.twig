@@ -1,27 +1,12 @@
-{% extends 'base.html.twig' %}
+{# templates/admin/custom.html.twig #}
+{% extends '@EasyAdmin/page/content.html.twig' %}
 
-{% block title %}Fernley Main Street America's Poker Run{% endblock %}
+{% block content_title %}Main Street Fernley's Poker Run{% endblock %}
 
-{% block body %}
+{% block main %}
     <div class="bg-secondary mb-2 px-2 d-flex">
         <a class="text-white" href="{{ path('app_welcome') }}">Poker Run</a>
-        <span class="mx-1">&gt;</span>
-        {% if user and user.id %}
-            {% if user.location and user.location.isVerified %}
-                <span class="text-white">Pick Card</span>
-                <span class="mx-1">&gt;</span>
-                <a class="text-white" href="{{ path('app_check_out') }}">Check Out</a>
-                <span class="mx-1">&gt;</span>
-            {% else %}
-                <a class="text-white" href="{{ path('app_check_in') }}">Check In</a>
-                <span class="mx-1">&gt;</span>
-            {% endif %}
-            {% if user.location and user.location.isVerified and not user.location.extra_card %}
-                <span class="flex-grow-1 text-end last">
-                    <a class="btn btn-success btn-sm" href="{{ path('app_extra') }}">Extra Card</a>
-                </span>
-            {% endif %}
-        {% endif %}
+
     </div>
 
     {% if user.location and user.location.isVerified %}
@@ -46,8 +31,105 @@
     {% else %}
         <div class="alert alert-info">
             You are not currently checked in at any location.
-            Please <a href="{{ path('app_check_in') }}">Check In</a> at a card stop to participate in the Poker Run.
+            Please Check In at a card stop to participate in the Poker Run.
         </div>
     {% endif %}
 
+    <!-- Display the user's poker hand if they have one -->
+    <div class="container-fluid my-4">
+        <h4 class="title">My Poker Hand:</h4>
+        <div class="row gx-1">
+            {% set card1No = '1' %}
+            {% if user.pokerHand and user.pokerHand.cardOne %}
+                {% set card1img = 'images/PlayingCards/' ~ user.pokerHand.cardOne.cardNumber ~ '_of_' ~ user.pokerHand.cardOne.cardSuit ~ '.png' %}
+            {% else %}
+                {% set card1img = 'images/PlayingCards/red-back.png' %}
+            {% endif %}
+            <div class="card poker-card">
+                <div class="poker-card-body" style="background-image: url('{{ asset(card1img) }}');">
+                   
+                </div>
+                <div class="pcf">
+                    {{ card1No }}
+                </div>
+            </div>
+            {% set card2No = '2' %}
+            {% if user.pokerHand and user.pokerHand.cardTwo %}
+                {% set card2img = 'images/PlayingCards/' ~ user.pokerHand.cardTwo.cardNumber ~ '_of_' ~ user.pokerHand.cardTwo.cardSuit ~ '.png' %}
+            {% else %}
+                {% set card2img = 'images/PlayingCards/red-back.png' %}
+            {% endif %}
+            <div class="card poker-card">
+                <div class="poker-card-body" style="background-image: url('{{ asset(card2img) }}');">
+                    
+                </div>
+                <div class="pcf">
+                    {{ card2No }}
+                </div>
+            </div>
+            {% set card3No = '3' %}
+            {% if user.pokerHand and user.pokerHand.cardThree %}
+                {% set card3img = 'images/PlayingCards/' ~ user.pokerHand.cardThree.cardNumber ~ '_of_' ~ user.pokerHand.cardThree.cardSuit ~ '.png' %}
+            {% else %}
+                {% set card3img = 'images/PlayingCards/red-back.png' %}
+            {% endif %}
+            <div class="card poker-card">
+                <div class="poker-card-body" style="background-image: url('{{ asset(card3img) }}');">
+                    
+                </div>
+                <div class="pcf">
+                    {{ card3No }}
+                </div>
+            </div>
+            {% set card4No = '4' %}
+            {% if user.pokerHand and user.pokerHand.cardFour %}
+                {% set card4img = 'images/PlayingCards/' ~ user.pokerHand.cardFour.cardNumber ~ '_of_' ~ user.pokerHand.cardFour.cardSuit ~ '.png' %}
+            {% else %}
+                {% set card4img = 'images/PlayingCards/red-back.png' %}
+            {% endif %}
+            <div class="card poker-card">
+                <div class="poker-card-body" style="background-image: url('{{ asset(card4img) }}');">
+                    
+                </div>
+                <div class="pcf">
+                    {{ card4No }}
+                </div>
+            </div>
+            {% set card5No = '5' %}
+            {% if user.pokerHand and user.pokerHand.cardFive %}
+                {% set card5img = 'images/PlayingCards/' ~ user.pokerHand.cardFive.cardNumber ~ '_of_' ~ user.pokerHand.cardFive.cardSuit ~ '.png' %}
+            {% else %}
+                {% set card5img = 'images/PlayingCards/red-back.png' %}
+            {% endif %}
+            <div class="card poker-card">
+                <div class="poker-card-body" style="background-image: url('{{ asset(card5img) }}');">
+                    
+                </div>
+                <div class="pcf">
+                    {{ card5No }}
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Display the user's cards -->
+    <div class="container-fluid my-4">
+        <h4 class="title">All My Cards:</h4>
+        <div class="row gx-1">
+            {% if user.cardList|length > 0 %}
+                {% for card in user.cardList %}
+                    <div class="card poker-card">
+                        <div class="poker-card-body">
+                            {{ card.cardNumber }} of {{ card.cardSuit }} 
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="card poker-card">
+                    <div class="poker-card-body"> </div>
+                    <div class="pcf">No cards picked yet.</div>
+                </div>
+            {% endif %}
+            </ul>
+        </div>
+    </div>
 {% endblock %}

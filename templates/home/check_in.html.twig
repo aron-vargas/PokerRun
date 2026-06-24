@@ -1,2 +1,14 @@
-{# templates/task/new.html.twig #}
-{{ form(form) }}
+{# templates/admin/custom.html.twig #}
+{% extends '@EasyAdmin/page/content.html.twig' %}
+
+{% block content_title %}Card Stop - Check IN{% endblock %}
+
+{% block main %}
+
+<div class="container">
+    <div class="container-body">
+        {{ form(form) }}
+    </div>
+</div>
+
+{% endblock %}

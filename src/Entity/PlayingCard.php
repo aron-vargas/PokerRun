@@ -17,22 +17,22 @@ class PlayingCard
     private ?int $id = null;
 
     #[ORM\Column(enumType: CardNumber::class)]
-    private ?CardNumber $card_number = null;
+    private ?CardNumber $cardNumber = null;
 
     #[ORM\Column(enumType: CardSuit::class)]
-    private ?CardSuit $card_suit = null;
+    private ?CardSuit $cardSuit = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $image = null;
 
-    #[ORM\OneToOne(mappedBy: 'card_one', cascade: ['persist', 'remove'])]
+    #[ORM\OneToOne(cascade: ['persist', 'remove'])]
     private ?PokerHand $pokerHand = null;
 
     #[ORM\ManyToOne(inversedBy: 'card_list')]
     #[ORM\JoinColumn(nullable: false)]
     private ?User $player = null;
 
-    #[ORM\OneToOne(mappedBy: 'first_card', cascade: ['persist', 'remove'])]
+    #[ORM\OneToOne(cascade: ['persist', 'remove'])]
     private ?PlayerLocation $location = null;
 
     public function getId(): ?int
@@ -49,24 +49,24 @@ class PlayingCard
 
     public function getCardNumber(): ?CardNumber
     {
-        return $this->card_number;
+        return $this->cardNumber;
     }
 
-    public function setCardNumber(CardNumber $card_number): static
+    public function setCardNumber(CardNumber $cardNumber): static
     {
-        $this->card_number = $card_number;
+        $this->cardNumber = $cardNumber;
 
         return $this;
     }
 
     public function getCardSuit(): ?CardSuit
     {
-        return $this->card_suit;
+        return $this->cardSuit;
     }
 
-    public function setCardSuit(CardSuit $card_suit): static
+    public function setCardSuit(CardSuit $cardSuit): static
     {
-        $this->card_suit = $card_suit;
+        $this->cardSuit = $cardSuit;
 
         return $this;
     }

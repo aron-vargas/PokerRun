@@ -14,6 +14,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Messenger\MessageBusInterface;
+use EasyCorp\Bundle\EasyAdminBundle\Attribute\AdminRoute;
 
 final class PlayerController extends AbstractController
 {
@@ -21,14 +22,15 @@ final class PlayerController extends AbstractController
     {
     }
 
-    #[Route('/player', name: 'app_player')]
+    #[AdminRoute('/', name: 'app_player')]
     public function index(): Response
     {
-        return $this->render('home/player.html.twig', [
+        return $this->render('home/index.html.twig', [
             'controller_name' => 'PlayerController',
         ]);
     }
-    #[Route('/profile', name: 'app_profile_show')]
+
+    #[AdminRoute('/profile', name: 'app_profile_show')]
     public function profile(): Response
     {
         return $this->render('home/player.html.twig', [
@@ -36,7 +38,7 @@ final class PlayerController extends AbstractController
         ]);
     }
 
-    #[Route('/check-in', name: 'app_check_in')]
+    #[AdminRoute('/check-in', name: 'app_check_in')]
     public function checkIn(Request $request, ?CardStop $cardStop, EntityManagerInterface $entityManager): Response
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
@@ -68,12 +70,11 @@ final class PlayerController extends AbstractController
         }
 
         return $this->render($twig, [
-            'form' => $form->createView(),
-            'controller_name' => 'PlayerController',
+            'form' => $form->createView()
         ]);
     }
 
-    #[Route('/check-out', name: 'app_check_out')]
+    #[AdminRoute('/check-out', name: 'app_check_out')]
     public function checkOut(EntityManagerInterface $entityManager): Response
     {
         /** @var User $user */

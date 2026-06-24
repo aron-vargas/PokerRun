@@ -14,19 +14,19 @@ class PokerHand
     private ?int $id = null;
 
     #[ORM\OneToOne(inversedBy: 'pokerHand', cascade: ['persist', 'remove'])]
-    private ?PlayingCard $card_one = null;
+    private ?PlayingCard $cardOne = null;
 
     #[ORM\OneToOne(cascade: ['persist', 'remove'])]
-    private ?PlayingCard $card_two = null;
+    private ?PlayingCard $cardTwo = null;
 
     #[ORM\OneToOne(cascade: ['persist', 'remove'])]
-    private ?PlayingCard $card_three = null;
+    private ?PlayingCard $cardThree = null;
 
     #[ORM\OneToOne(cascade: ['persist', 'remove'])]
-    private ?PlayingCard $card_four = null;
+    private ?PlayingCard $cardFour = null;
 
     #[ORM\OneToOne(cascade: ['persist', 'remove'])]
-    private ?PlayingCard $card_five = null;
+    private ?PlayingCard $cardFive = null;
 
     #[ORM\OneToOne(inversedBy: 'pokerHand', cascade: ['persist', 'remove'])]
     #[ORM\JoinColumn(nullable: false)]
@@ -46,60 +46,60 @@ class PokerHand
 
     public function getCardOne(): ?PlayingCard
     {
-        return $this->card_one;
+        return $this->cardOne;
     }
 
-    public function setCardOne(?PlayingCard $card_one): static
+    public function setCardOne(?PlayingCard $cardOne): static
     {
-        $this->card_one = $card_one;
+        $this->cardOne = $cardOne;
 
         return $this;
     }
 
     public function getCardTwo(): ?PlayingCard
     {
-        return $this->card_two;
+        return $this->cardTwo;
     }
 
-    public function setCardTwo(?PlayingCard $card_two): static
+    public function setCardTwo(?PlayingCard $cardTwo): static
     {
-        $this->card_two = $card_two;
+        $this->cardTwo = $cardTwo;
 
         return $this;
     }
 
     public function getCardThree(): ?PlayingCard
     {
-        return $this->card_three;
+        return $this->cardThree;
     }
 
-    public function setCardThree(?PlayingCard $card_three): static
+    public function setCardThree(?PlayingCard $cardThree): static
     {
-        $this->card_three = $card_three;
+        $this->cardThree = $cardThree;
 
         return $this;
     }
 
     public function getCardFour(): ?PlayingCard
     {
-        return $this->card_four;
+        return $this->cardFour;
     }
 
-    public function setCardFour(?PlayingCard $card_four): static
+    public function setCardFour(?PlayingCard $cardFour): static
     {
-        $this->card_four = $card_four;
+        $this->cardFour = $cardFour;
 
         return $this;
     }
 
     public function getCardFive(): ?PlayingCard
     {
-        return $this->card_five;
+        return $this->cardFive;
     }
 
-    public function setCardFive(?PlayingCard $card_five): static
+    public function setCardFive(?PlayingCard $cardFive): static
     {
-        $this->card_five = $card_five;
+        $this->cardFive = $cardFive;
 
         return $this;
     }

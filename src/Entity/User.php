@@ -39,6 +39,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private ?string $password = null;
 
+    private ?string $plainPassword = null;
+
     #[ORM\Column]
     private bool $isVerified = false;
 
@@ -54,18 +56,15 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToOne(mappedBy: 'Player', cascade: ['persist', 'remove'])]
     private ?PokerHand $pokerHand = null;
 
-    /**
-     * @var Collection<int, PlayingCard>
-     */
     #[ORM\OneToMany(targetEntity: PlayingCard::class, mappedBy: 'player', orphanRemoval: true)]
-    private Collection $card_list;
+    private Collection $cardList;
 
     #[ORM\OneToOne(mappedBy: 'Player', cascade: ['persist', 'remove'])]
     private ?PlayerLocation $location = null;
 
     public function __construct()
     {
-        $this->card_list = new ArrayCollection();
+        $this->cardList = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -156,6 +155,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+    public function getPlainPassword(): ?string
+    {
+        return $this->plainPassword;
+    }
+
+    public function setPlainPassword(?string $plainPassword): void
+    {
+        $this->plainPassword = $plainPassword;
+    }
+
     /**
      * Ensure the session doesn't contain actual password hashes by CRC32C-hashing them, as supported since Symfony 7.3.
      */
@@ -244,13 +253,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     public function getCardList(): Collection
     {
-        return $this->card_list;
+        return $this->cardList;
     }
 
     public function addCardList(PlayingCard $cardList): static
     {
-        if (!$this->card_list->contains($cardList)) {
-            $this->card_list->add($cardList);
+        if (!$this->cardList->contains($cardList)) {
+            $this->cardList->add($cardList);
             $cardList->setPlayer($this);
         }
 
@@ -259,7 +268,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function removeCardList(PlayingCard $cardList): static
     {
-        if ($this->card_list->removeElement($cardList)) {
+        if ($this->cardList->removeElement($cardList)) {
             // set the owning side to null (unless already changed)
             if ($cardList->getPlayer() === $this) {
                 $cardList->setPlayer(null);
