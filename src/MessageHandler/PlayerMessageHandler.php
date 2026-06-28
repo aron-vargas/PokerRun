@@ -3,10 +3,12 @@
 namespace App\MessageHandler;
 
 use App\Message\PlayerMessage;
+use App\Message\CardStopMessage;
+use App\DataFixtures\PlayerAction;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
-
+use Symfony\Component\Messenger\MessageBusInterface;
 
 #[AsMessageHandler]
 class PlayerMessageHandler
@@ -14,7 +16,7 @@ class PlayerMessageHandler
     private HttpClientInterface $client;
     private string $apiKey;
 
-    public function __construct(HttpClientInterface $client, ParameterBagInterface $parameterBag)
+    public function __construct(HttpClientInterface $client, ParameterBagInterface $parameterBag, private MessageBusInterface $messageBus)
     {
         $this->client = $client;
         $this->apiKey = $parameterBag->get('app.constant_contact.api_key');
@@ -45,11 +47,11 @@ class PlayerMessageHandler
             ],
             'json' => [
                 'email_address' => [
-                    'address' => $message->getEmail(),
+                    'address' => $message->getPlayer()->getEmail(),
                     'permission_to_send' => 'explicit'
                 ],
-                'first_name' => $message->getFirstName(),
-                'last_name' => $message->getLastName(),
+                'first_name' => $message->getPlayer()->getFirstName(),
+                'last_name' => $message->getPlayer()->getLastName(),
             ]
         ]);
     }
@@ -57,7 +59,7 @@ class PlayerMessageHandler
     private function handleCheckin(PlayerMessage $message): void
     {
         // Send message to queue for check in
-        $this->messageBus->dispatch(new CardStopMessage($message->GetUser()->getId(), $message->getLocation->getId(), $message->GetCardStop()->GetId(), PlayerAction::$CheckIn));
+        $this->messageBus->dispatch(new CardStopMessage($message->getPlayer(), $message->getLocation(), PlayerAction::$CheckIn));
     }
 
     private function handleUpdate(PlayerMessage $message): void

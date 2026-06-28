@@ -982,8 +982,8 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         },
  *         html_input?: "strip"|"allow"|"escape"|Param, // How to handle HTML input.
  *         allow_unsafe_links?: bool|Param, // Remove risky link and image URLs by setting this to false. // Default: true
- *         max_nesting_level?: int|Param, // The maximum nesting level for blocks. // Default: 9223372036854775807
- *         max_delimiters_per_line?: int|Param, // The maximum number of strong/emphasis delimiters per line. // Default: 9223372036854775807
+ *         max_nesting_level?: int|Param, // The maximum nesting level for blocks. // Default: 2147483647
+ *         max_delimiters_per_line?: int|Param, // The maximum number of strong/emphasis delimiters per line. // Default: 2147483647
  *         slug_normalizer?: array{ // Array of options for configuring how URL-safe slugs are created.
  *             instance?: mixed,
  *             max_length?: int|Param, // Default: 255

@@ -32,6 +32,9 @@ class PlayerLocation
     #[ORM\Column(name: 'checkin_time',nullable: true)]
     private ?\DateTime $checkinTime = null;
 
+    #[ORM\Column(name: 'purchase_time', nullable: true)]
+    private ?\DateTime $purchaseTime = null;
+
     #[ORM\Column(name: 'verified_on', nullable: true)]
     private ?\DateTime $verified_on = null;
 

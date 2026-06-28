@@ -4,16 +4,19 @@ namespace App\Controller;
 
 use App\Entity\CardStop;
 use App\Repository\PlayerLocationRepository;
+use App\Message\PlayerMessage;
+use App\DataFixtures\PlayerAction;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
 use EasyCorp\Bundle\EasyAdminBundle\Attribute\AdminRoute;
+use Symfony\Component\Messenger\MessageBusInterface;
 
 final class CardStopController extends AbstractController
 {
-    public function __construct(private PlayerLocationRepository $locationRepo)
+    public function __construct(private PlayerLocationRepository $locationRepo, private MessageBusInterface $messageBus)
     {
 
     }
@@ -35,6 +38,9 @@ final class CardStopController extends AbstractController
         {
             $location = $this->locationRepo->GetOneById($location_id);
             $this->locationRepo->verifyLocation($location, true);
+
+            // Send Notication to Player
+            $this->messageBus->dispatch(new PlayerMessage($location->Player, null, PlayerAction::$ApproveCheckin));
         }
 
         return $this->render('card_stop/index.html.twig', [
@@ -51,6 +57,47 @@ final class CardStopController extends AbstractController
         {
             $location = $this->locationRepo->GetOneById($location_id);
             $this->locationRepo->removeLocation($location, true);
+
+            // Send Notication to Player
+            $this->messageBus->dispatch(new PlayerMessage($location->Player, $location, PlayerAction::$DenyCheckin));
+        }
+
+        return $this->render('card_stop/index.html.twig', [
+            'controller_name' => 'CardStopController',
+        ]);
+    }
+
+    #[AdminRoute('/puchase/confirm', name: 'puchase_confirm')]
+    public function confirmPurchase(int $location_id, int $player_id): Response
+    {
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+
+        if ($this->isGranted('ROLE_CARD_STOP'))
+        {
+            $location = $this->locationRepo->GetOneById($location_id);
+            $this->locationRepo->verifyLocation($location, true);
+
+            // Send Notication to Player
+            $this->messageBus->dispatch(new PlayerMessage($location->Player, null, PlayerAction::$ApproveCheckin));
+        }
+
+        return $this->render('card_stop/index.html.twig', [
+            'controller_name' => 'CardStopController',
+        ]);
+    }
+
+    #[AdminRoute('/puchase/deny', name: 'puchase_deny')]
+    public function denyPurchase(int $location_id, int $player_id): Response
+    {
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+
+        if ($this->isGranted('ROLE_CARD_STOP'))
+        {
+            $location = $this->locationRepo->GetOneById($location_id);
+            $this->locationRepo->removeLocation($location, true);
+
+            // Send Notication to Player
+            $this->messageBus->dispatch(new PlayerMessage($location->Player, $location, PlayerAction::$DenyCheckin));
         }
 
         return $this->render('card_stop/index.html.twig', [

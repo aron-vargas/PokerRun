@@ -3,29 +3,37 @@
 // src/Message/PlayerMessage.php
 namespace App\Message;
 
+use App\Entity\User;
+use App\Entity\PlayerLocation;
+use App\Entity\CardStop;
 use App\DataFixtures\PlayerAction;
 
 class PlayerMessage
 {
-    private int $id;
-    private string $email;
-    private ?string $firstName;
-    private ?string $lastName;
+    private User $Player;
+    private ?PlayerLocation $Location;
 
-    private ?PlayerAction $action;
+    private ?string $action;
 
-    public function __construct(int $id, string $email, ?string $firstName = null, ?string $lastName = null, ?PlayerAction $action = null)
+    public function __construct(User $Player, ?PlayerLocation $Location, string $action)
     {
-        $this->id = $id;
-        $this->email = $email;
-        $this->firstName = $firstName;
-        $this->lastName = $lastName;
+        $this->Player = $Player;
+        $this->Location = $Location;
         $this->action = $action;
     }
 
-    public function getId(): int { return $this->id; }
-    public function getEmail(): string { return $this->email; }
-    public function getFirstName(): ?string { return $this->firstName; }
-    public function getLastName(): ?string { return $this->lastName; }
-    public function getAction(): ?PlayerAction { return $this->action; }
+    public function getPlayer(): User
+    {
+        return $this->Player;
+    }
+    
+    public function getLocation(): PlayerLocation
+    {
+        return $this->Location;
+    }
+
+    public function getAction(): ?PlayerAction
+    {
+        return $this->action;
+    }
 }

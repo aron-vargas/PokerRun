@@ -40,7 +40,7 @@ class RegistrationController extends AbstractController {
             $user->setPassword($userPasswordHasher->hashPassword($user, $plainPassword));
             $user->setIsVerified(false);
             $user->setActive(true);
-            $user->setRoles(['ROLE_USER','ROLE_PLAYER']);
+            $user->setRoles(['ROLE_USER', 'ROLE_PLAYER']);
             //$user->setCreatedOn(new \DateTime());
             //$user->setUpdatedOn(new \DateTime());
 
@@ -57,9 +57,9 @@ class RegistrationController extends AbstractController {
             );
 
             // do anything else you need here, like send an email
-            $this->messageBus->dispatch(new PlayerMessage($user->getEmail(), $user->getFirstName(), $user->getLastName(), PlayerAction::$Register));
+            $this->messageBus->dispatch(new PlayerMessage($user, null, PlayerAction::$Register));
 
-            return $this->redirectToRoute('home');
+            return $this->redirectToRoute('app_welcome');
         }
 
         return $this->render('registration/register.html.twig', [

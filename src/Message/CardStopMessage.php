@@ -2,17 +2,34 @@
 // src/Message/CardStopMessage.php
 namespace App\Message;
 
-class CardStopMessage
-{
-    private string $userId;
+use App\Entity\User;
+use App\Entity\PlayerLocation;
+use App\Entity\CardStop;
+
+class CardStopMessage {
+    private User $Player;
+    private ?PlayerLocation $Location;
     private string $action;
 
-    public function __construct(string $userId, string $action)
+    public function __construct(User $Player, ?PlayerLocation $Location, string $action)
     {
-        $this->userId = $userId;
+        $this->Player = $Player;
+        $this->Location = $Location;
         $this->action = $action;
     }
 
-    public function getUserId(): string { return $this->userId; }
-    public function getAction(): string { return $this->action; }
+    public function getPlayer(): User
+    {
+        return $this->Player;
+    }
+    
+    public function getLocation(): PlayerLocation
+    {
+        return $this->Location;
+    }
+
+    public function getAction(): string
+    {
+        return $this->action;
+    }
 }

@@ -67,7 +67,7 @@ final class PlayerController extends AbstractController
             $entityManager->flush();
 
             // Send message to queue for check in
-            $this->messageBus->dispatch(new PlayerMessage($user->getEmail(), $user->getFirstName(), $user->getLastName(), PlayerAction::$CheckIn));
+            $this->messageBus->dispatch(new PlayerMessage($user, $new_location, PlayerAction::$CheckIn));
 
             $twig = 'home/index.html.twig';
         }

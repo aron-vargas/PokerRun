@@ -17,9 +17,8 @@ use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 
-class CheckInFormType extends AbstractType
-{
-    public function __construct(private Security $security, private Packages $assetManager) 
+class CheckInFormType extends AbstractType {
+    public function __construct(private Security $security, private Packages $assetManager)
     {
 
     }
@@ -27,19 +26,21 @@ class CheckInFormType extends AbstractType
     {
         // grab the user, do a quick sanity check that one exists
         /*
-        * @var \App\Entity\User $user
-        */
+         * @var \App\Entity\User $user
+         */
         $user = $this->security->getUser();
-        if (!$user) 
+        if (!$user)
         {
             throw new \LogicException('The CheckInFormType cannot be used without an authenticated user!');
         }
 
         // Add the Player ID as a hidden field, since we need it to associate the check-in with the user, but we don't want the user to modify it
-        $builder->add('player_id', HiddenType::class, ['property_path' => 'Player.id']);
+        $builder->add('player_id', HiddenType::class, ['property_path' => 'Player.id', 'mapped' => false]);
 
-        $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) use ($user) {
-            if (null !== $event->getData()->getCardStop()) {
+        $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) use ($user)
+        {
+            if (null !== $event->getData()->getCardStop())
+            {
                 // we don't need to add the field because
                 // the message will be addressed to a fixed card stop
                 return;
@@ -54,22 +55,28 @@ class CheckInFormType extends AbstractType
                 // render as radio buttons
                 'expanded' => true,
                 'multiple' => false,
+                'required' => true,
                 // allow HTML inside the label (we build an <img> + name)
                 'label_html' => true,
-                'choice_label' => function (CardStop $cardStop) use ($genericImageSrc) {
+                'choice_label' => function (CardStop $cardStop) use ($genericImageSrc)
+                {
                     $name = htmlspecialchars((string) $cardStop->getCardStopName(), ENT_QUOTES, 'UTF-8');
                     $logo = $cardStop->getLogo();
 
-                    if ($logo) {
+                    if ($logo)
+                    {
                         $src = $logo;
-                    } else {
+                    }
+                    else
+                    {
                         // fallback generic building image from public assets
                         $src = $genericImageSrc;
                     }
 
                     return sprintf('<img src="%s" alt="%s logo" style="height:24px;width:24px;object-fit:cover;margin-right:8px;border-radius:4px;vertical-align:middle;">%s', $src, $name, $name);
                 },
-                'query_builder' => function (CardStopRepository $repo) use ($user) {
+                'query_builder' => function (CardStopRepository $repo) use ($user)
+                {
                     // call a method on your repository that returns the query builder
                     return $repo->findAllUnvisitedCardStopsForPlayerQB($user->getId());
                 },
