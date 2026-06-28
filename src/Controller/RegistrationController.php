@@ -18,9 +18,10 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
 use SymfonyCasts\Bundle\VerifyEmail\Exception\VerifyEmailExceptionInterface;
+use Symfony\Bundle\SecurityBundle\Security;
 
 class RegistrationController extends AbstractController {
-    public function __construct(private EmailVerifier $emailVerifier, private MessageBusInterface $messageBus)
+    public function __construct(private EmailVerifier $emailVerifier, private MessageBusInterface $messageBus, private Security $security)
     {
     }
 
@@ -59,6 +60,8 @@ class RegistrationController extends AbstractController {
             // do anything else you need here, like send an email
             $this->messageBus->dispatch(new PlayerMessage($user, null, PlayerAction::$Register));
 
+            $this->security->login($user);
+       
             return $this->redirectToRoute('app_welcome');
         }
 
