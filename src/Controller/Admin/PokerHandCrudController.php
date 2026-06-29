@@ -2,6 +2,8 @@
 
 namespace App\Controller\Admin;
 
+use App\Entity\User;
+use App\Entity\PlayingCard;
 use App\Entity\PokerHand;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
@@ -19,7 +21,7 @@ class PokerHandCrudController extends AbstractCrudController
     public function configureFields(string $pageName): iterable
     {
         $hand = $this->getContext()?->getEntity()->getInstance();
-        
+
         $oneChoices = [];
         if ($hand instanceof PokerHand && $hand->getCardOne() !== null) {
             $oneChoices = [$hand->getCardOne()];
@@ -52,57 +54,51 @@ class PokerHandCrudController extends AbstractCrudController
 
         return [
             IdField::new('id'),
-            AssociationField::new('player')->setFormTypeOptions([
-                'by_reference' => false,
-                'multiple' => false,
+            AssociationField::new('Player')->setFormTypeOptions([
+                'class' => User::class,
                 'choice_label' => function ($user)
                 {
                     return $user->getFirstName() . ' ' . $user->getLastName() . ' (' . $user->getEmail() . ')';
                 },
                 'choices' => $playerChoices,
             ]),
-            AssociationField::new('card_one')->setFormTypeOptions([
-                'by_reference' => false,
-                'multiple' => false,
+            AssociationField::new('cardOne')->setFormTypeOptions([
+                'class' => PlayingCard::class,
                 'choice_label' => function ($card)
                 {
-                    return $card->getCardNumber() . ' of ' . $card->getCardSuit();
+                    return $card->getCardNumber()->name . ' of ' . $card->getCardSuit()->name;
                 },
                 'choices' => $oneChoices,
             ]),
-            AssociationField::new('card_two')->setFormTypeOptions([
-                'by_reference' => false,
-                'multiple' => false,
+            AssociationField::new('cardTwo')->setFormTypeOptions([
+                'class' => PlayingCard::class,
                 'choice_label' => function ($card)
                 {
-                    return $card->getCardNumber() . ' of ' . $card->getCardSuit();
+                    return $card->getCardNumber()->name . ' of ' . $card->getCardSuit()->name;
                 },
                 'choices' => $twoChoices,
             ]),
-            AssociationField::new('card_three')->setFormTypeOptions([
-                'by_reference' => false,
-                'multiple' => false,
+            AssociationField::new('cardThree')->setFormTypeOptions([
+                'class' => PlayingCard::class,
                 'choice_label' => function ($card)
                 {
-                    return $card->getCardNumber() . ' of ' . $card->getCardSuit();
+                    return $card->getCardNumber()->name . ' of ' . $card->getCardSuit()->name;
                 },
                 'choices' => $threeChoices,
             ]),
-            AssociationField::new('card_four')->setFormTypeOptions([
-                'by_reference' => false,
-                'multiple' => false,
+            AssociationField::new('cardFour')->setFormTypeOptions([
+                'class' => PlayingCard::class,
                 'choice_label' => function ($card)
                 {
-                    return $card->getCardNumber() . ' of ' . $card->getCardSuit();
+                    return $card->getCardNumber()->name . ' of ' . $card->getCardSuit()->name;
                 },
                 'choices' => $fourChoices,
             ]),
-            AssociationField::new('card_five')->setFormTypeOptions([
-                'by_reference' => false,
-                'multiple' => false,
+            AssociationField::new('cardFive')->setFormTypeOptions([
+                'class' => PlayingCard::class,
                 'choice_label' => function ($card)
                 {
-                    return $card->getCardNumber() . ' of ' . $card->getCardSuit();
+                    return $card->getCardNumber()->name . ' of ' . $card->getCardSuit()->name;
                 },
                 'choices' => $fiveChoices,
             ])

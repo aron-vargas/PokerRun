@@ -2,18 +2,19 @@
 
 namespace App\Enum;
 
-enum CardNumber: int {
-    case Ace = 1;
-    case Two = 2;
-    case Three = 3;
-    case Four = 4;
-    case Five = 5;
-    case Six = 6;
-    case Seven = 7;
-    case Eight = 8;
-    case Nine = 9;
-    case Ten = 10;
-    case Jack = 11;
-    case Queen = 12;
-    case King = 13;
+enum CardNumber: string {
+    case joker = 'joker';
+    case ace = 'ace';
+    case two = 'two';
+    case three = 'three';
+    case four = 'four';
+    case five = 'five';
+    case six = 'six';
+    case seven = 'seven';
+    case eight = 'eight';
+    case nine = 'nine';
+    case ten = 'ten';
+    case jack = 'jack';
+    case queen = 'queen';
+    case king = 'king';
 }

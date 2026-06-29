@@ -3,21 +3,24 @@
 {% extends '@EasyAdmin/page/content.html.twig' %}
 
 {% block content_title %}
-    {% if user and user.cardStop %}
-        Welcome to {{ user.cardStop.getCardStopName() }}
+    <div style="border-bottom: 1px solid #3f3f3f; padding-bottom: 1rem;">
+    {% if app.user and app.user.cardStop %}
+        Card Stop:
+        <span class="mx-3 p-2 display-4" style='background-color: #fdf2e2'>{{ app.user.cardStop.getCardStopName() }}</span>
     {% else %}
         Main Street Fernley Card Stop
     {% endif %}
+    </div>
 {% endblock %}
 
 {% block main %}
 <style>
-    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
+    .example-wrapper { margin: 1em auto; max-width: 100%; width: 95%; font: 18px/1.5 sans-serif; }
     .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
 </style>
 
 <div class="example-wrapper">
-    <h1 class='title'>Recent Player Activity</h1>
+    <h1 class='title'>Player Checkins</h1>
     <table class="table table-striped mb-6">
         <thead>
             <tr>
@@ -30,11 +33,11 @@
             {% for location in pendingVerifications %}
                 <tr>
                     <td>{{ location.firstName }} {{ location.lastName }}</td>
-                    <td>{{ location.checkInTime|date('Y-m-d H:i:s') }}</td>
-                    <td>{{ activity.location }}</td>
+                    <td>{{ location.checkinTime|date('Y-m-d H:i:s') }}</td>
+                    <td>{{ location.location }}</td>
                     <td>
-                        <a class="btn btn-success" href={{ path('checkin_confirm', ['location_id' => location.id, 'player_id' => location.player_id]) }}>Confirm</a>
-                        <a class="btn btn-danger" href={{ path('checkin_deny', ['location_id' => location.id, 'player_id' => location.player_id]) }}>Deny</a>
+                        <a class="btn btn-success" href="{{ path('checkin_confirm', {'location_id': location.id, 'player_id': location.player_id}) }}">Confirm</a>
+                        <a class="btn btn-danger" href="{{ path('checkin_deny', {'location_id': location.id, 'player_id': location.player_id}) }}">Deny</a>
                     </td>
                 </tr>
             {% endfor %}

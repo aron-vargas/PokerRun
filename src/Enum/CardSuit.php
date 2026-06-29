@@ -3,8 +3,8 @@
 namespace App\Enum;
 
 enum CardSuit: string {
-    case Hearts = 'Hearts';
-    case Diamonds = 'Diamonds';
-    case Clubs = 'Clubs';
-    case Spades = 'Spades';
+    case Hearts = 'hearts';
+    case Diamonds = 'diamonds';
+    case Clubs = 'clubs';
+    case Spades = 'spades';
 }

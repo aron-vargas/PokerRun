@@ -37,7 +37,7 @@ class CheckInFormType extends AbstractType {
         // Add the Player ID as a hidden field, since we need it to associate the check-in with the user, but we don't want the user to modify it
         $builder->add('player_id', HiddenType::class, ['property_path' => 'Player.id', 'mapped' => false]);
 
-        $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) use ($user)
+        $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) use ($user, $options)
         {
             if (null !== $event->getData()->getCardStop())
             {
@@ -75,7 +75,7 @@ class CheckInFormType extends AbstractType {
 
                     return sprintf('<img src="%s" alt="%s logo" style="height:24px;width:24px;object-fit:cover;margin-right:8px;border-radius:4px;vertical-align:middle;">%s', $src, $name, $name);
                 },
-                'query_builder' => function (CardStopRepository $repo) use ($user)
+                'query_builder' => function (CardStopRepository $repo) use ($user, $options)
                 {
                     // call a method on your repository that returns the query builder
                     return $repo->findAllUnvisitedCardStopsForPlayerQB($user->getId());
@@ -87,7 +87,7 @@ class CheckInFormType extends AbstractType {
             $form->add('CardStop', EntityType::class, $formOptions);
             $form->add('save', SubmitType::class, [
                 'label' => 'Check It', // Text displayed on the button
-                'attr' => ['class' => 'btn btn-primary'] // Optional: add CSS classes
+                'attr' => ['class' => 'btn btn-primary', 'disabled' => !$options['user_is_verified']] // Optional: add CSS classes
             ]);
         });
     }
@@ -96,6 +96,8 @@ class CheckInFormType extends AbstractType {
     {
         $resolver->setDefaults([
             'data_class' => PlayerLocation::class,
+            'csrf_token_id' => 'check_in',
+            'user_is_verified' => false,
         ]);
     }
 }
