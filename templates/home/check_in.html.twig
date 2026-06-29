@@ -1,6 +1,8 @@
 {# templates/admin/custom.html.twig #}
 {% extends '@EasyAdmin/page/content.html.twig' %}
 
+{{ include('menus/playerbar.html.twig', ignore missing) }}
+
 {% block content_title %}Card Stop - Check IN{% endblock %}
 
 {% block main %}

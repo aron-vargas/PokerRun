@@ -1,6 +1,8 @@
 {# templates/admin/custom.html.twig #}
 {% extends '@EasyAdmin/page/content.html.twig' %}
 
+{{ include('menus/playerbar.html.twig', ignore missing) }}
+
 {% block content_title %}Main Street Fernley's Poker Run{% endblock %}
 
 {% set user = app.user %}
