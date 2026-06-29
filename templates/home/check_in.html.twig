@@ -7,7 +7,45 @@
 
 <div class="container">
     <div class="container-body">
-        {{ form(form) }}
+        {% for message in app.flashes('warning') %}
+            <div class="alert alert-warning" role="alert">
+                {{ message }}
+            </div>
+        {% endfor %}
+
+        {% for message in app.flashes('success') %}
+            <div class="alert alert-success" role="alert">
+                {{ message }}
+            </div>
+        {% endfor %}
+
+        {% if app.user and app.user.getLocation() %}
+            {% if not app.user.getLocation().isVerified() %}
+                <div class="alert alert-warning">
+                    <img class="me-2" src="{{ app.user.getLocation().getCardStop().getLogo() }}" style="height: 50px; width: auto;"/>
+                    <span>
+                        Your check-in at {{ app.user.getLocationName() }} is pending verification.
+                        <br/>
+                        Please wait for a staff member to verify your check-in.
+                    </span>
+                </div>
+            {% else %}
+                <div class="alert alert-info" role="alert">
+                    You are currently checked in at {{ app.user.getLocationName() }}.
+                </div>
+            {% endif %}
+        {% elseif form is defined and form %}
+            {% if app.user and not app.user.isVerified() %}
+            <div class="alert alert-warning" role="alert">
+                Your account must be verified to check in.
+            </div>
+            {% endif %}
+            {{ form(form) }}
+        {% else %}
+            <div class="alert alert-warning" role="alert">
+                No card stop is currently available for check-in.
+            </div>
+        {% endif %}
     </div>
 </div>
 

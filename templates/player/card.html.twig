@@ -1,0 +1,10 @@
+
+{% if card %}
+    {% set card1img = card.getImage() %}
+{% else %}
+    {% set card1img = 'images/PlayingCards/red-back.png' %}
+{% endif %}
+<div class="card poker-card">
+    <div class="poker-card-body" style="background-image: url('{{ asset(card1img) }}');">
+    </div>
+</div>

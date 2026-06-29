@@ -14,8 +14,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL', fields: ['email'])]
 #[UniqueEntity(fields: ['email'], message: 'There is already an account with this email')]
-class User implements UserInterface, PasswordAuthenticatedUserInterface
-{
+class User implements UserInterface, PasswordAuthenticatedUserInterface {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -59,7 +58,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(targetEntity: PlayingCard::class, mappedBy: 'player', orphanRemoval: true)]
     private Collection $cardList;
 
-    #[ORM\OneToOne(mappedBy: 'Player', cascade: ['persist', 'remove'])]
+    #[ORM\OneToOne(inversedBy: 'Player')]
     private ?PlayerLocation $location = null;
 
     public function __construct()
@@ -126,7 +125,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $roles = $this->roles;
 
         // guarantee every user at least has ROLE_USER
-        if (empty($roles)) {
+        if (empty($roles))
+        {
             $roles[] = 'ROLE_USER';
         }
 
@@ -171,7 +171,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function __serialize(): array
     {
         $data = (array) $this;
-        $data["\0".self::class."\0password"] = hash('crc32c', $this->password);
+        $data["\0" . self::class . "\0password"] = hash('crc32c', $this->password);
 
         return $data;
     }
@@ -202,10 +202,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function getAvatar(): ?string
     {
-        if (!$this->avatar) {
+        if (!$this->avatar)
+        {
             return null;
         }
-        if (strpos($this->avatar, '/') !== false) {
+        if (strpos($this->avatar, '/') !== false)
+        {
             return $this->avatar;
         }
 
@@ -233,13 +235,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function getPokerHand(): ?PokerHand
     {
-        return $this->pokerHand ;
+        return $this->pokerHand;
     }
 
     public function setPokerHand(?PokerHand $pokerHand): static
     {
         // set the owning side of the relation if necessary
-        if ($pokerHand && $pokerHand->getPlayer() !== $this) {
+        if ($pokerHand && $pokerHand->getPlayer() !== $this)
+        {
             $pokerHand->setPlayer($this);
         }
 
@@ -258,7 +261,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function addCardList(PlayingCard $cardList): static
     {
-        if (!$this->cardList->contains($cardList)) {
+        if (!$this->cardList->contains($cardList))
+        {
             $this->cardList->add($cardList);
             $cardList->setPlayer($this);
         }
@@ -268,9 +272,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function removeCardList(PlayingCard $cardList): static
     {
-        if ($this->cardList->removeElement($cardList)) {
+        if ($this->cardList->removeElement($cardList))
+        {
             // set the owning side to null (unless already changed)
-            if ($cardList->getPlayer() === $this) {
+            if ($cardList->getPlayer() === $this)
+            {
                 $cardList->setPlayer(null);
             }
         }
@@ -283,15 +289,26 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->location;
     }
 
+    public function getLocationName(): string
+    {
+        return $this->location && $this->location->getCardStop() ? $this->location->getCardStop()->getCardStopName() : 'Not Checked In';
+    }
+
     public function setLocation(?PlayerLocation $location): static
     {
         // set the owning side of the relation if necessary
-        if ($location->getPlayer() !== $this) {
+        if ($location && $location->getPlayer() !== $this)
+        {
             $location->setPlayer($this);
         }
 
         $this->location = $location;
 
         return $this;
+    }
+
+    public function __toString(): string
+    {
+        return ('#' . $this->id . ' ' . ucfirst($this->firstName) . ' ' . ucfirst($this->lastName)) ?? '';
     }
 }

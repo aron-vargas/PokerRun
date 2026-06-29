@@ -13,9 +13,9 @@ class PlayerLocation
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\OneToOne(inversedBy: 'location', cascade: ['persist', 'remove'])]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?User $Player = null;
+    #[ORM\ManyToOne(inversedBy: 'location')]
+    #[ORM\JoinColumn(name: 'player_id', nullable: false)]
+    private User $Player;
 
     #[ORM\ManyToOne]
     private ?CardStop $CardStop = null;

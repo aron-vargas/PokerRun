@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\CardStop;
+use App\Entity\User;
 use App\Repository\PlayerLocationRepository;
 use App\Message\PlayerMessage;
 use App\DataFixtures\PlayerAction;
@@ -14,14 +15,13 @@ use Symfony\Component\Routing\Attribute\Route;
 use EasyCorp\Bundle\EasyAdminBundle\Attribute\AdminRoute;
 use Symfony\Component\Messenger\MessageBusInterface;
 
-final class CardStopController extends AbstractController
-{
+final class CardStopController extends AbstractController {
     public function __construct(private PlayerLocationRepository $locationRepo, private MessageBusInterface $messageBus)
     {
 
     }
 
-    #[AdminRoute('/', name: 'app_card_stop')]
+    #[Route('/cardstop', name: 'app_card_stop')]
     public function index(): Response
     {
         return $this->render('card_stop/index.html.twig', [
@@ -29,56 +29,21 @@ final class CardStopController extends AbstractController
         ]);
     }
 
-    #[AdminRoute('/checkin/confirm', name: 'checkin_confirm')]
-    public function confirmCheckin(int $location_id, int $player_id): Response
-    {
-        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
-
-        if ($this->isGranted('ROLE_CARD_STOP'))
-        {
-            $location = $this->locationRepo->GetOneById($location_id);
-            $this->locationRepo->verifyLocation($location, true);
-
-            // Send Notication to Player
-            $this->messageBus->dispatch(new PlayerMessage($location->Player, null, PlayerAction::$ApproveCheckin));
-        }
-
-        return $this->render('card_stop/index.html.twig', [
-            'controller_name' => 'CardStopController',
-        ]);
-    }
-
-    #[AdminRoute('/checkin/deny', name: 'checkin_deny')]
-    public function denyCheckin(int $location_id, int $player_id): Response
-    {
-        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
-
-        if ($this->isGranted('ROLE_CARD_STOP'))
-        {
-            $location = $this->locationRepo->GetOneById($location_id);
-            $this->locationRepo->removeLocation($location, true);
-
-            // Send Notication to Player
-            $this->messageBus->dispatch(new PlayerMessage($location->Player, $location, PlayerAction::$DenyCheckin));
-        }
-
-        return $this->render('card_stop/index.html.twig', [
-            'controller_name' => 'CardStopController',
-        ]);
-    }
-
-    #[AdminRoute('/puchase/confirm', name: 'puchase_confirm')]
+    #[AdminRoute('/puchase/confirm/{location_id}/{player_id}', name: 'puchase_confirm')]
     public function confirmPurchase(int $location_id, int $player_id): Response
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
 
         if ($this->isGranted('ROLE_CARD_STOP'))
         {
-            $location = $this->locationRepo->GetOneById($location_id);
-            $this->locationRepo->verifyLocation($location, true);
+            // Get the user object
+            /** @var User $user */
+            $user = $this->getUser();
+            $location = $this->locationRepo->findOneById($location_id);
+            $this->locationRepo->verifyLocation($location, $user->getId(), true);
 
             // Send Notication to Player
-            $this->messageBus->dispatch(new PlayerMessage($location->Player, null, PlayerAction::$ApproveCheckin));
+            $this->messageBus->dispatch(new PlayerMessage($location->getPlayer(), null, PlayerAction::$ApproveCheckin));
         }
 
         return $this->render('card_stop/index.html.twig', [
@@ -86,18 +51,22 @@ final class CardStopController extends AbstractController
         ]);
     }
 
-    #[AdminRoute('/puchase/deny', name: 'puchase_deny')]
+    #[AdminRoute('/puchase/deny/{location_id}/{player_id}', name: 'puchase_deny')]
     public function denyPurchase(int $location_id, int $player_id): Response
     {
+        // Get the user object
+        /** @var User $user */
+        $user = $this->getUser();
+
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
 
         if ($this->isGranted('ROLE_CARD_STOP'))
         {
-            $location = $this->locationRepo->GetOneById($location_id);
+            $location = $this->locationRepo->findOneById($location_id);
             $this->locationRepo->removeLocation($location, true);
 
             // Send Notication to Player
-            $this->messageBus->dispatch(new PlayerMessage($location->Player, $location, PlayerAction::$DenyCheckin));
+            $this->messageBus->dispatch(new PlayerMessage($location->getPlayer(), $location, PlayerAction::$DenyCheckin));
         }
 
         return $this->render('card_stop/index.html.twig', [

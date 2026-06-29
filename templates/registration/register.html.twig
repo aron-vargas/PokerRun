@@ -7,17 +7,69 @@
         <div class="alert alert-danger" role="alert">{{ flash_error }}</div>
     {% endfor %}
 
-    <h1>Register</h1>
+    <div class='text-center'>
+        <img class='my-2 img-fluid text-center' src="images/PokerRun-logo.jpg"/>
+    </div>
 
-    {{ form_errors(registrationForm) }}
+    <div class="row text-center mx-5">
+        <h1 class='my-5'>Welcome to Fernley Main Street America's Poker Run</h1>
+        <div class="col-md-4 mx-auto">
+            {{ form_errors(registrationForm) }}
 
-    {{ form_start(registrationForm) }}
-        {{ form_row(registrationForm.email) }}
-        {{ form_row(registrationForm.plainPassword, {
-            label: 'Password'
-        }) }}
-        {{ form_row(registrationForm.agreeTerms) }}
+            {{ form_start(registrationForm, { attr: { autocomplete: 'on' } }) }}
+                <div class="form-floating mb-4">
+                    {{ form_widget(registrationForm.email, {
+                        attr: {
+                            autocomplete: 'email username',
+                            placeholder: 'Email'
+                        }
+                    }) }}
+                    {{ form_label(registrationForm.email, 'Email') }}
+                </div>
+                <div class="text-start mb-4">
+                    {{ form_errors(registrationForm.email) }}
+                </div>
 
-        <button type="submit" class="btn">Register</button>
-    {{ form_end(registrationForm) }}
+                <div class="form-floating mb-4">
+                    {{ form_widget(registrationForm.firstName, {
+                        attr: {
+                            placeholder: 'First name'
+                        }
+                    }) }}
+                    {{ form_label(registrationForm.firstName, 'First name') }}
+                </div>
+
+                <div class="form-floating mb-4">
+                    {{ form_widget(registrationForm.lastName, {
+                        attr: {
+                            placeholder: 'Last name'
+                        }
+                    }) }}
+                    {{ form_label(registrationForm.lastName, 'Last name') }}
+                </div>
+
+                <div class="form-floating mb-4">
+                    {{ form_widget(registrationForm.plainPassword, {
+                        attr: {
+                            autocomplete: 'new-password',
+                            placeholder: 'Password'
+                        }
+                    }) }}
+                    {{ form_label(registrationForm.plainPassword, 'Password') }}
+                </div>
+
+                <div class="form-check mb-4 text-start">
+                    {{ form_widget(registrationForm.agreeTerms, { attr: { class: 'form-check-input' } }) }}
+                    {{ form_label(registrationForm.agreeTerms, null, { label_attr: { class: 'form-check-label' } }) }}
+                </div>
+
+                <button type="submit" class="w-100 btn btn-lg btn-primary">Register</button>
+
+                 <!-- Register buttons -->
+                <div class="text-center">
+                    <p>Already registered? <a href="{{ path('app_login') }}">Login Here</a></p>
+                </div>
+            {{ form_end(registrationForm) }}
+        </div>
+    </div>
 {% endblock %}

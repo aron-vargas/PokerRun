@@ -28,7 +28,7 @@ class PlayingCard
     #[ORM\OneToOne(cascade: ['persist', 'remove'])]
     private ?PokerHand $pokerHand = null;
 
-    #[ORM\ManyToOne(inversedBy: 'card_list')]
+    #[ORM\ManyToOne(inversedBy: 'cardList')]
     #[ORM\JoinColumn(nullable: false)]
     private ?User $player = null;
 
@@ -121,6 +121,10 @@ class PlayingCard
     {
         return $this->location;
     }
+    public function getLocationName(): ?string
+    {
+        return $this->location?->getCardStop()?->getCardStopName();
+    }
 
     public function setLocation(?PlayerLocation $location): static
     {
@@ -137,5 +141,10 @@ class PlayingCard
         $this->location = $location;
 
         return $this;
+    }
+
+    public function __toString(): string
+    {
+        return (ucfirst($this->cardNumber?->name) . ' of ' . ucfirst($this->cardSuit?->name)) ?? '';
     }
 }

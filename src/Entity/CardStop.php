@@ -131,6 +131,6 @@ class CardStop
 
     public function __toString(): string
     {
-        return $this->card_stop_name ?? '';
+        return ('#' . $this->id . ' ' . ucfirst($this->card_stop_name)) ?? '';
     }
 }

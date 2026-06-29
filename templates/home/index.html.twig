@@ -3,30 +3,37 @@
 
 {% block content_title %}Main Street Fernley's Poker Run{% endblock %}
 
+{% set user = app.user %}
+
 {% block main %}
     <div class="bg-secondary mb-2 px-2 d-flex">
         <a class="text-white" href="{{ path('app_welcome') }}">Poker Run</a>
 
     </div>
-
-    {% if user.location and user.location.isVerified %}
+{# <pre>
+{{ dump(user) }}
+</pre> #}
+    {% if user.location and user.location.isVerified() %}
         <div class="alert alert-success">
-            <img class="me-2" src="{{ user.location.CardStop.logo }}" style="height: 50px; width: auto;"/>
-            You are currently checked in at {{ user.location.CardStop.card_stop_name }}
+            <img class="me-2" src="{{ user.location.getCardStop().getLogo() }}" style="height: 50px; width: auto;"/>
+            You are currently checked in at {{ user.location.getCardStop().getCardStopName() }}
         </div>
-        {% if user.location.first_card %}
+        {% if user.location.getFirstCard() %}
             <div class="alert alert-info">
-                {% include 'player/card.html.twig' with { 'card': user.location.first_card } %}
+                {% include 'player/card.html.twig' with { 'card': user.location.getFirstCard() } %}
+                <div class="pcf text-start">
+                    You Picked a {{ user.location.getFirstCard().getCardNumber().name|capitalize }} of {{ user.location.getFirstCard().getCardSuit().name|capitalize }}
+                </div>
             </div>
         {% else %}
             <div class="alert alert-info">
                 <a href="{{ path('app_pick_card') }}" class="btn btn-primary">Pick Your Card</a>
             </div>
         {% endif %}
-    {% elseif user.location and not user.location.isVerified %}
+    {% elseif user.location and not user.location.isVerified() %}
         <div class="alert alert-warning">
-            <img class="me-2" src="{{ user.location.CardStop.logo }}" style="height: 50px; width: auto;"/>
-            Your check-in at {{ user.location.CardStop.card_stop_name }} is pending verification. Please wait for a staff member to verify your check-in.
+            <img class="me-2" src="{{ user.location.getCardStop().getLogo() }}" style="height: 50px; width: auto;"/>
+            Your check-in at {{ user.location.getCardStop().getCardStopName() }} is pending verification. Please wait for a staff member to verify your check-in.
         </div>
     {% else %}
         <div class="alert alert-info">
@@ -37,73 +44,81 @@
 
     <!-- Display the user's poker hand if they have one -->
     <div class="container-fluid my-4">
-        <h4 class="title">My Poker Hand:</h4>
+        <h4 class="title">
+            My Poker Hand:
+            <small class="text-muted">
+                {% if user.pokerHand %}
+                    {{ user.pokerHand.getBestHandLabel() }}
+                    <a href="{{ path('app_best_hand') }}" class="btn btn-sm btn-primary px-2">Select Best Hand</a>
+                {% endif %}
+            </small>
+        </h4>
         <div class="row gx-1">
             {% set card1No = '1' %}
-            {% if user.pokerHand and user.pokerHand.cardOne %}
-                {% set card1img = 'images/PlayingCards/' ~ user.pokerHand.cardOne.cardNumber ~ '_of_' ~ user.pokerHand.cardOne.cardSuit ~ '.png' %}
+            {% if user.pokerHand and user.pokerHand.getCardOne() %}
+                {% set card1img = user.pokerHand.getCardOne().getImage() %}
             {% else %}
                 {% set card1img = 'images/PlayingCards/red-back.png' %}
             {% endif %}
             <div class="card poker-card">
                 <div class="poker-card-body" style="background-image: url('{{ asset(card1img) }}');">
-                   
+
                 </div>
                 <div class="pcf">
                     {{ card1No }}
                 </div>
             </div>
             {% set card2No = '2' %}
-            {% if user.pokerHand and user.pokerHand.cardTwo %}
-                {% set card2img = 'images/PlayingCards/' ~ user.pokerHand.cardTwo.cardNumber ~ '_of_' ~ user.pokerHand.cardTwo.cardSuit ~ '.png' %}
+            {% if user.pokerHand and user.pokerHand.getCardTwo() %}
+                {% set card2img = user.pokerHand.getCardTwo().getImage() %}
             {% else %}
                 {% set card2img = 'images/PlayingCards/red-back.png' %}
             {% endif %}
             <div class="card poker-card">
                 <div class="poker-card-body" style="background-image: url('{{ asset(card2img) }}');">
-                    
+
                 </div>
                 <div class="pcf">
                     {{ card2No }}
                 </div>
             </div>
             {% set card3No = '3' %}
-            {% if user.pokerHand and user.pokerHand.cardThree %}
-                {% set card3img = 'images/PlayingCards/' ~ user.pokerHand.cardThree.cardNumber ~ '_of_' ~ user.pokerHand.cardThree.cardSuit ~ '.png' %}
+            {% if user.pokerHand and user.pokerHand.getCardThree() %}
+                {% set card3img = user.pokerHand.getCardThree().getImage() %}
             {% else %}
                 {% set card3img = 'images/PlayingCards/red-back.png' %}
             {% endif %}
             <div class="card poker-card">
                 <div class="poker-card-body" style="background-image: url('{{ asset(card3img) }}');">
-                    
+
                 </div>
                 <div class="pcf">
                     {{ card3No }}
                 </div>
             </div>
             {% set card4No = '4' %}
-            {% if user.pokerHand and user.pokerHand.cardFour %}
-                {% set card4img = 'images/PlayingCards/' ~ user.pokerHand.cardFour.cardNumber ~ '_of_' ~ user.pokerHand.cardFour.cardSuit ~ '.png' %}
+            {% if user.pokerHand and user.pokerHand.getCardFour() %}
+                {% set card4img = user.pokerHand.getCardFour().getImage() %}
             {% else %}
                 {% set card4img = 'images/PlayingCards/red-back.png' %}
             {% endif %}
             <div class="card poker-card">
                 <div class="poker-card-body" style="background-image: url('{{ asset(card4img) }}');">
-                    
+
                 </div>
                 <div class="pcf">
                     {{ card4No }}
                 </div>
             </div>
             {% set card5No = '5' %}
-            {% if user.pokerHand and user.pokerHand.cardFive %}
-                {% set card5img = 'images/PlayingCards/' ~ user.pokerHand.cardFive.cardNumber ~ '_of_' ~ user.pokerHand.cardFive.cardSuit ~ '.png' %}
+            {% if user.pokerHand and user.pokerHand.getCardFive() %}
+                {% set card5img = user.pokerHand.getCardFive().getImage() %}
             {% else %}
                 {% set card5img = 'images/PlayingCards/red-back.png' %}
             {% endif %}
             <div class="card poker-card">
                 <div class="poker-card-body" style="background-image: url('{{ asset(card5img) }}');">
-                    
+
                 </div>
                 <div class="pcf">
                     {{ card5No }}
@@ -117,9 +132,13 @@
         <div class="row gx-1">
             {% if user.cardList|length > 0 %}
                 {% for card in user.cardList %}
+                    {% set cardimg = card.getImage() %}
                     <div class="card poker-card">
-                        <div class="poker-card-body">
-                            {{ card.cardNumber }} of {{ card.cardSuit }} 
+                        <div class="poker-card-body" style="background-image: url('{{ asset(cardimg) }}');">
+
+                        </div>
+                         <div class="pcf">
+                            @ {{ card.getLocationName()|capitalize }}
                         </div>
                     </div>
                 {% endfor %}

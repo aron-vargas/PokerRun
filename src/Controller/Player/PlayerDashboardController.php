@@ -43,16 +43,19 @@ class PlayerDashboardController extends AbstractDashboardController
 
         if ($user->GetLocation() && $user->GetLocation()->isVerified())
         {
-            yield MenuItem::linkToRoute('Pick Card', 'fa fa-card', 'app_pick_card');
-            yield MenuItem::linkToRoute('Pick Card', 'fa fa-card', 'app_check_out');
-
-            if (!$user->GetLocation()->getExtraCard())
-                yield MenuItem::linkToRoute('Pick Card', 'fa fa-card', 'app_extra_card');
+            if (!$user->getLocation()->getFirstCard())
+            {
+                yield MenuItem::linkToRoute('Pick Card', 'fa fa-card', 'app_pick_card');
+            }
+            
+            yield MenuItem::linkToRoute('Check Out', 'fa fa-card', 'app_check_out');
         }
         else
         {
             yield MenuItem::linkToRoute('Check In', 'fa fa-chart-bar', 'app_check_in');
         }
+
+        yield MenuItem::linkToRoute('Rules', 'fa fa-gavel', 'app_rules');
         // yield MenuItem::linkTo(SomeCrudController::class, 'The Label', 'fas fa-list');
     }
 }

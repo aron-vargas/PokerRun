@@ -1,25 +1,22 @@
-.poker-card
-{
+.poker-card {
     flex: 0 1 auto;
-    width: 6em !important;
+    width: 6.5em !important;
     font-size: 14px;
     margin: 5px;
     padding: 5px 8px;
 }
 
-.poker-card-body
-{
+.poker-card-body {
     display: inline-block;
-    height: 100px;
+    height: 7.5em;
     width: 100%;
     font-size: 14px;
     background-image: url('../images/red_joker.png');
-    background-size: cover; 
+    background-size: cover;
     background-position: center;
 }
 
-.pcf
-{
+.pcf {
     padding: 2px;
     font-size: 14px;
     text-align: center;

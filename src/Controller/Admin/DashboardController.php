@@ -7,6 +7,8 @@ use App\Entity\Role;
 use App\Entity\CardStop;
 use App\Entity\PlayerLocation;
 use App\Entity\PokerHand;
+use App\Message\PlayerMessage;
+use App\DataFixtures\PlayerAction;
 use App\Repository\PlayerLocationRepository;
 use App\Repository\PlayingCardRepository;
 use App\Repository\PokerHandRepository;
@@ -16,6 +18,8 @@ use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Assets;
 use EasyCorp\Bundle\EasyAdminBundle\Attribute\AdminDashboard;
+use EasyCorp\Bundle\EasyAdminBundle\Attribute\AdminRoute;
+use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
 use EasyCorp\Bundle\EasyAdminBundle\Config\UserMenu;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Dashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
@@ -23,26 +27,32 @@ use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractDashboardController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Security\Core\User\UserInterface;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Messenger\MessageBusInterface;
 
 #[AdminDashboard(routePath: '/admin', routeName: 'admin')]
-class DashboardController extends AbstractDashboardController
-{
+class DashboardController extends AbstractDashboardController {
     private PlayerLocationRepository $playerLocationRepository;
     private PlayingCardRepository $playingCardRepository;
     private PokerHandRepository $pokerHandRepository;
     private UserRepository $userRepository;
+    private AdminUrlGenerator $adminUrlGenerator;
+    private MessageBusInterface $messageBus;
 
     public function __construct(
         PlayerLocationRepository $playerLocationRepository,
         PlayingCardRepository $playingCardRepository,
         PokerHandRepository $pokerHandRepository,
-        UserRepository $userRepository
+        UserRepository $userRepository,
+        AdminUrlGenerator $adminUrlGenerator,
+        MessageBusInterface $messageBus
     ) {
         $this->playerLocationRepository = $playerLocationRepository;
         $this->playingCardRepository = $playingCardRepository;
         $this->pokerHandRepository = $pokerHandRepository;
         $this->userRepository = $userRepository;
+        $this->adminUrlGenerator = $adminUrlGenerator;
+        $this->messageBus = $messageBus;
     }
 
     #[IsGranted('ROLE_ADMIN')]
@@ -63,6 +73,56 @@ class DashboardController extends AbstractDashboardController
         ]);
     }
 
+    #[IsGranted('ROLE_ADMIN')]
+    #[Route('/admin/checkin/confirm/{location_id}/{player_id}', name: 'admin_checkin_confirm')]
+    #[AdminRoute('/checkin/confirm/{location_id}/{player_id}', name: 'admin_checkin_confirm')]
+    public function confirmCheckin(int $location_id, int $player_id): Response
+    {
+        // Get the user object
+        /** @var User $user */
+        $user = $this->getUser();
+
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+
+        $location = $this->playerLocationRepository->findOneById($location_id);
+        $this->playerLocationRepository->verifyLocation($location, $user->getId(), true);
+
+        // Send Notication to Player
+        $this->messageBus->dispatch(new PlayerMessage($location->getPlayer(), $location, PlayerAction::$ApproveCheckin));
+
+        $url = $this->adminUrlGenerator
+            ->setController(PlayerLocationCrudController::class) // Replace with your target CRUD controller
+            ->setAction(Action::INDEX)
+            ->generateUrl();
+
+        return $this->redirect($url);
+    }
+
+    #[IsGranted('ROLE_ADMIN')]
+    #[Route('/admin/checkin/deny/{location_id}/{player_id}', name: 'admin_checkin_deny')]
+    #[AdminRoute('/checkin/deny/{location_id}/{player_id}', name: 'admin_checkin_deny')]
+    public function denyCheckin(int $location_id, int $player_id): Response
+    {
+        // Get the user object
+        /** @var User $user */
+        $user = $this->getUser();
+
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+
+        $location = $this->playerLocationRepository->findOneById($location_id);
+        $this->playerLocationRepository->removeLocation($location, true);
+
+        // Send Notication to Player
+        $this->messageBus->dispatch(new PlayerMessage($location->getPlayer(), $location, PlayerAction::$DenyCheckin));
+
+        $url = $this->adminUrlGenerator
+            ->setController(PlayerLocationCrudController::class) // Replace with your target CRUD controller
+            ->setAction(Action::INDEX)
+            ->generateUrl();
+
+        return $this->redirect($url);
+    }
+
     public function configureDashboard(): Dashboard
     {
         return Dashboard::new()
@@ -72,14 +132,16 @@ class DashboardController extends AbstractDashboardController
     public function configureMenuItems(): iterable
     {
         yield MenuItem::linkToDashboard('Dashboard', 'fa fa-dashboard');
-        yield MenuItem::linkTo(UserCrudController::class,'Users', 'fa fa-users')->setAction('index');
-       // yield MenuItem::linkTo(RoleCrudController::class,'Roles', 'fa fa-circle-user')->setAction('index');
-        yield MenuItem::linkTo(CardStopCrudController::class,'Card Stops', 'fa fa-building')->setAction('index');
-        yield MenuItem::linkTo(PlayerLocationCrudController::class,'Player Stops', 'fa fa-map-marker')->setAction('index');
-        yield MenuItem::linkTo(PokerHandCrudController::class,'Poker Hands', 'fa fa-cards')->setAction('index');
+        yield MenuItem::linkTo(UserCrudController::class, 'Users', 'fa fa-users')->setAction('index');
+        // yield MenuItem::linkTo(RoleCrudController::class,'Roles', 'fa fa-circle-user')->setAction('index');
+        yield MenuItem::linkTo(CardStopCrudController::class, 'Card Stops', 'fa fa-building')->setAction('index');
+        yield MenuItem::linkTo(PlayerLocationCrudController::class, 'Player Stops', 'fa fa-map-marker')->setAction('index');
+        yield MenuItem::linkTo(PokerHandCrudController::class, 'Poker Hands', 'fa fa-layer-group')->setAction('index');
         // yield MenuItem::linkTo(SomeCrudController::class, 'The Label', 'fas fa-list');
 
         yield MenuItem::linkToExitImpersonation('Exit Impersonation', 'fa fa-sign-out-alt');
+
+        yield MenuItem::linkToRoute('Rules', 'fa fa-gavel', 'app_rules');
     }
 
     public function configureActions(): Actions
@@ -96,7 +158,8 @@ class DashboardController extends AbstractDashboardController
 
     public function configureUserMenu(UserInterface $user): UserMenu
     {
-        if (!$user instanceof User) {
+        if (!$user instanceof User)
+        {
             throw new \Exception('Invalid user');
         }
 

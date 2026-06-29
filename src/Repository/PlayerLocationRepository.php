@@ -113,6 +113,7 @@ class PlayerLocationRepository extends ServiceEntityRepository
             ->select('pl.id AS id', 'u.id AS player_id', 'u.firstName AS firstName', 'u.lastName AS lastName', 'pl.checkinTime AS checkinTime', 'cs.card_stop_name AS location')
             ->join('pl.Player', 'u')
             ->leftJoin('pl.CardStop', 'cs')
+            ->andWhere('u.isVerified = 1')
             ->andWhere('pl.isVerified = 0')
             ->andWhere('cs.id = :stop')
             ->setParameter('stop', $card_stop_id)
@@ -131,7 +132,7 @@ class PlayerLocationRepository extends ServiceEntityRepository
             ->join('pl.Player', 'u')
             ->leftJoin('pl.CardStop', 'cs')
             ->andWhere('pl.isVerified = 1')
-            ->andWhere('pl.purchaseTime is null')
+            ->andWhere('pl.purchase_time is null')
             ->andWhere('cs.id = :stop')
             ->setParameter('stop', $card_stop_id)
             ->orderBy('pl.checkinTime', 'DESC')
@@ -144,6 +145,7 @@ class PlayerLocationRepository extends ServiceEntityRepository
 
     public function removeLocation(PlayerLocation $entity, bool $flush = true): void
     {
+        $entity->getPlayer()->setLocation(null);
         $this->getEntityManager()->remove($entity);
 
         if ($flush) {
