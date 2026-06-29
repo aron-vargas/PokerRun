@@ -1,17 +1,14 @@
 {# templates/admin/custom.html.twig #}
 {% extends '@EasyAdmin/page/content.html.twig' %}
 
-{{ include('menus/playerbar.html.twig', ignore missing) }}
-
 {% block content_title %}Main Street Fernley's Poker Run{% endblock %}
 
 {% set user = app.user %}
 
 {% block main %}
-    <div class="bg-secondary mb-2 px-2 d-flex">
-        <a class="text-white" href="{{ path('app_welcome') }}">Poker Run</a>
 
-    </div>
+    {{ include('menus/playerbar.html.twig') }}
+
 {# <pre>
 {{ dump(user) }}
 </pre> #}

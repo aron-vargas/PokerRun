@@ -1,7 +1,9 @@
 {% extends '@EasyAdmin/page/content.html.twig' %}
 
 {% block content %}
+
 <div class="content">
+    {{ include('menus/adminbar.html.twig') }}
     <section class="content-header">
         <div class="content-header-title">
             <h1 class='title'>Dashboard Overview</h1>
@@ -45,7 +47,7 @@
                     <div class="d-flex justify-content-between align-itemt-center mb-3">
                         <span class="text-muted fw-medium text-uppercase medium">Total Poker Cards</span>
                         <div class="bg-primary-subtle text-primary rounded px-2 py-1">
-                            <i class="fa fa-card-list fs-5"></i>
+                            <i class="fa fa-layer-group fs-5"></i>
                         </div>
                     </div>
                     <h3 class="mb-2 fw-bold">{{ totalPokerCards }}</h3>

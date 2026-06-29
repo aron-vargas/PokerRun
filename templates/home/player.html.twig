@@ -1,11 +1,12 @@
 {# templates/admin/custom.html.twig #}
 {% extends '@EasyAdmin/page/content.html.twig' %}
 
-{{ include('menus/playerbar.html.twig', ignore missing) }}
-
 {% block title %}User Profile - {{ app.user.firstName }} {{ app.user.lastName }}{% endblock %}
 
-{% block body %}
+{% block content %}
+
+    {{ include('menus/playerbar.html.twig') }}
+
     <div class="container py-5">
         <div class="row justify-content-center">
             <div class="col-lg-6">
