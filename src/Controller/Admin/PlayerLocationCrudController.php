@@ -37,6 +37,11 @@ class PlayerLocationCrudController extends AbstractCrudController {
 
     public function configureActions(Actions $actions): Actions
     {
+        $reloadAction = Action::new('refresh', 'Refresh', 'fa fa-refresh')
+            ->linkToCrudAction('index') // Name of the handler method below
+            ->createAsGlobalAction()          // Highlights it as a main top button
+            ->setCssClass('btn btn-primary'); // Styles it using Bootstrap
+
         $confirmCheckinAction = Action::new('confirmCheckin', 'Confirm Check-In', 'fa fa-check')
             ->linkToRoute('admin_checkin_confirm', function (PlayerLocation $playerLocation): array
             {
@@ -51,10 +56,10 @@ class PlayerLocationCrudController extends AbstractCrudController {
             });
 
         $actions->add(Crud::PAGE_INDEX, $confirmCheckinAction);
+        $actions->add(Crud::PAGE_INDEX, $reloadAction);
 
         return parent::configureActions($actions);
     }
-
 
     public function configureFields(string $pageName): iterable
     {

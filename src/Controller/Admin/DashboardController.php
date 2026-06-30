@@ -78,7 +78,6 @@ class DashboardController extends AbstractDashboardController {
     }
 
     #[IsGranted('ROLE_ADMIN')]
-    #[Route('/admin/checkin/confirm/{location_id}/{player_id}', name: 'admin_checkin_confirm')]
     #[AdminRoute('/checkin/confirm/{location_id}/{player_id}', name: 'admin_checkin_confirm')]
     public function confirmCheckin(int $location_id, int $player_id): Response
     {
@@ -103,7 +102,6 @@ class DashboardController extends AbstractDashboardController {
     }
 
     #[IsGranted('ROLE_ADMIN')]
-    #[Route('/admin/checkin/deny/{location_id}/{player_id}', name: 'admin_checkin_deny')]
     #[AdminRoute('/checkin/deny/{location_id}/{player_id}', name: 'admin_checkin_deny')]
     public function denyCheckin(int $location_id, int $player_id): Response
     {

@@ -35,7 +35,6 @@ class CardStopDashboardController extends AbstractDashboardController {
         return $this->render('card_stop/index.html.twig', ['user' => $user, 'pendingVerifications' => $pendingVerifications]);
     }
 
-    #[Route('/cardstop/checkin/confirm/{location_id}/{player_id}', name: 'checkin_confirm')]
     #[AdminRoute('/checkin/confirm/{location_id}/{player_id}', name: 'checkin_confirm')]
     public function confirmCheckin(int $location_id, int $player_id): Response
     {
@@ -45,16 +44,11 @@ class CardStopDashboardController extends AbstractDashboardController {
 
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
 
-        if ($this->isGranted('ROLE_CARD_STOP'))
-        {
-            $location = $this->playerLocationRepository->findOneById($location_id);
-            $this->playerLocationRepository->verifyLocation($location, $user->getId(), true);
+        $location = $this->playerLocationRepository->findOneById($location_id);
+        $this->playerLocationRepository->verifyLocation($location, $user->getId(), true);
 
-            // Send Notication to Player
-            $this->messageBus->dispatch(new PlayerMessage($location->getPlayer(), $location, PlayerAction::$ApproveCheckin));
-
-            //return $this->redirectToRoute('cardstop');
-        }
+        // Send Notication to Player
+        $this->messageBus->dispatch(new PlayerMessage($location->getPlayer(), $location, PlayerAction::$ApproveCheckin));
 
         $stop_id = $user->getCardStop()->GetId();
         $pendingVerifications = $this->playerLocationRepository->findCardStopUnverified($stop_id, 50);
@@ -66,7 +60,6 @@ class CardStopDashboardController extends AbstractDashboardController {
         ]);
     }
 
-    #[Route('/cardstop/checkin/deny/{location_id}/{player_id}', name: 'checkin_deny')]
     #[AdminRoute('/checkin/deny/{location_id}/{player_id}', name: 'checkin_deny')]
     public function denyCheckin(int $location_id, int $player_id): Response
     {

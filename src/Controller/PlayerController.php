@@ -162,6 +162,8 @@ final class PlayerController extends AbstractController {
         }
 
         $entityManager->persist($card);
+        $user->setLocation(null);
+        $entityManager->persist($user);
         $entityManager->flush();
 
         $this->addFlash('success', 'Your card has been picked.');

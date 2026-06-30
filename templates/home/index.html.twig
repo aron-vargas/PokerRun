@@ -19,7 +19,7 @@
 </pre> #}
     {% if user.location and user.location.isVerified() %}
         <div class="alert alert-success">
-            <img class="me-2" src="{{ user.location.getCardStop().getLogo() }}" style="height: 50px; width: auto;"/>
+            <img class="me-2" src="{{ asset(user.location.getCardStop().getLogo()) }}" style="height: 50px; width: auto;"/>
             You are currently checked in at {{ user.location.getCardStop().getCardStopName() }}
         </div>
         {% if user.location.getFirstCard() %}
@@ -31,18 +31,17 @@
             </div>
         {% else %}
             <div class="alert alert-info">
-                <a href="{{ path('app_pick_card') }}" class="btn btn-primary">Pick Your Card</a>
+                <a href="{{ path('app_pick_card') }}" class="btn btn-primary">Pick A Card</a>
             </div>
         {% endif %}
     {% elseif user.location and not user.location.isVerified() %}
         <div class="alert alert-warning">
-            <img class="me-2" src="{{ user.location.getCardStop().getLogo() }}" style="height: 50px; width: auto;"/>
+            <img class="me-2" src="{{ asset(user.location.getCardStop().getLogo()) }}" style="height: 50px; width: auto;"/>
             Your check-in at {{ user.location.getCardStop().getCardStopName() }} is pending verification. Please wait for a staff member to verify your check-in.
         </div>
     {% else %}
         <div class="alert alert-info">
-            You are not currently checked in at any location.
-            Please Check In at a card stop to participate in the Poker Run.
+            Please Check In at a Card Stop to pick your next card.
         </div>
     {% endif %}
 
@@ -50,10 +49,9 @@
     <div class="container-fluid my-4">
         <h4 class="title">
             My Poker Hand:
-            <small class="text-muted">
+            <small class="text-muted mx-2">
                 {% if user.pokerHand %}
                     {{ user.pokerHand.getBestHandLabel() }}
-                    <a href="{{ path('app_best_hand') }}" class="btn btn-sm btn-primary px-2">Select Best Hand</a>
                 {% endif %}
             </small>
         </h4>
@@ -134,7 +132,14 @@
     </div>
     <!-- Display the user's cards -->
     <div class="container-fluid my-4">
-        <h4 class="title">All My Cards:</h4>
+        <h4 class="title">
+            All My Cards:
+            <small class="text-muted mx-2">
+            {% if user.pokerHand %}
+                <a href="{{ path('app_best_hand') }}" class="btn btn-sm btn-primary ms-4 px-2">Select Best Hand</a>
+            {% endif %}
+            </small>
+        </h4>
         <div class="row gx-1">
             {% if user.cardList|length > 0 %}
                 {% for card in user.cardList %}

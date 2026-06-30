@@ -8,10 +8,15 @@
 {% endblock %}
 
 {% block content_title %}
-    <div style="border-bottom: 1px solid #3f3f3f; padding-bottom: 1rem;">
+    <div class="d-flex pb-1" style="border-bottom: 1px solid #3f3f3f;">
     {% if app.user and app.user.cardStop %}
-        Card Stop:
-        <span class="mx-3 p-2 display-4" style='background-color: #fdf2e2'>{{ app.user.cardStop.getCardStopName() }}</span>
+        <span class='p-2'>
+            Card Stop:
+        </span>
+        <span class="me-3 p-2 display-4" style='background-color: #fdf2e2'>
+            <img class="me-2" src="{{ asset(app.user.cardStop.getLogo()) }}" style="height: 50px; width: auto;"/>
+            {{ app.user.cardStop.getCardStopName() }}
+        </span>
     {% else %}
         Main Street Fernley Card Stop
     {% endif %}
@@ -25,7 +30,12 @@
 </style>
 
 <div class="example-wrapper">
-    <h1 class='title'>Player Checkins</h1>
+    <h1 class='title'>
+        Player Checkins
+        <small class="float-end">
+            <a class="btn btn-primary btn-small p-2" href="{{ path('app_card_stop') }}"><i class="fa fa-refresh"></i></a>
+        </small>
+    </h1>
     <table class="table table-striped mb-6">
         <thead>
             <tr>
@@ -41,8 +51,8 @@
                     <td>{{ location.checkinTime|date('Y-m-d H:i:s') }}</td>
                     <td>{{ location.location }}</td>
                     <td>
-                        <a class="btn btn-success" href="{{ path('checkin_confirm', {'location_id': location.id, 'player_id': location.player_id}) }}">Confirm</a>
-                        <a class="btn btn-danger" href="{{ path('checkin_deny', {'location_id': location.id, 'player_id': location.player_id}) }}">Deny</a>
+                        <a class="btn btn-success" href="{{ path('cardstop_checkin_confirm', {'location_id': location.id, 'player_id': location.player_id}) }}">Confirm</a>
+                        <a class="btn btn-danger" href="{{ path('cardstop_checkin_deny', {'location_id': location.id, 'player_id': location.player_id}) }}">Deny</a>
                     </td>
                 </tr>
             {% endfor %}

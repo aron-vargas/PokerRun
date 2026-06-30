@@ -31,18 +31,31 @@
                 <div class="alert alert-warning">
                     <img class="me-2" src="{{ asset(app.user.getLocation().getCardStop().getLogo()) }}" style="height: 50px; width: auto;"/>
                     <span>
-                        Your check-in at {{ app.user.getLocationName() }} is pending verification.
+                        Your check-in at {{ app.user.getLocation().getCardStop().getCardStopName() }} is pending verification.
                         <br/>
                         Please wait for a staff member to verify your check-in.
                     </span>
                 </div>
             {% else %}
-                <div class="alert alert-info" role="alert">
+                <div class="alert alert-success" role="alert">
                     <img class="me-2" src="{{ asset(app.user.getLocation().getCardStop().getLogo()) }}" style="height: 50px; width: auto;"/>
                     <span>
-                    You are currently checked in at {{ app.user.getLocationName() }}.
+                    You are currently checked in at {{ app.user.getLocation().getCardStop().getCardStopName() }}.
                     </span>
                 </div>
+                {% if app.user.getLocation().getFirstCard() %}
+                    <div class="alert alert-info">
+                        {% include 'player/card.html.twig' with { 'card': app.user.getLocation().getFirstCard() } %}
+                        <div class="pcf text-start">
+                            You Picked a {{ app.user.getLocation().getFirstCard().getCardNumber().name|capitalize }} of {{ app.user.getLocation().getFirstCard().getCardSuit().name|capitalize }}
+                        </div>
+                        <a class="my-2 btn btn-sm btn-primary px-2" href="{{ path('app_check_out') }}">Check Out</a>
+                    </div>
+                {% else %}
+                    <div class="alert alert-info">
+                        <a href="{{ path('app_pick_card') }}" class="btn btn-primary">Pick A Card</a>
+                    </div>
+                {% endif %}
             {% endif %}
         {% elseif form is defined and form %}
             {% if app.user and not app.user.isVerified() %}
