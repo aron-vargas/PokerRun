@@ -99,12 +99,12 @@ final class CardStopController extends AbstractController {
     //     ]);
     // }
 
-    #[Route('/cardstop/profile', name: 'app_cs_profile')]
-    #[AdminRoute('/profile', name: 'app_cs_profile')]
-    public function profile(): Response
-    {
-        return $this->render('card_stop/profile.html.twig', [
-            'controller_name' => 'CardStopController',
-        ]);
-    }
+    // #[Route('/cardstop/profile', name: 'app_cs_profile')]
+    // #[AdminRoute('/profile', name: 'app_cs_profile')]
+    // public function profile(): Response
+    // {
+    //     return $this->render('card_stop/profile.html.twig', [
+    //         'controller_name' => 'CardStopController',
+    //     ]);
+    // }
 }

@@ -13,13 +13,16 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\NumberField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use Doctrine\Persistence\ManagerRegistry;
 use App\Entity\User;
+use Symfony\Component\Asset\Packages;
 
 class CardStopCrudController extends AbstractCrudController {
     private ManagerRegistry $doctrine;
+    private Packages $assetManager;
 
-    public function __construct(ManagerRegistry $doctrine)
+    public function __construct(ManagerRegistry $doctrine, Packages $assetManager)
     {
         $this->doctrine = $doctrine;
+        $this->assetManager = $assetManager;
     }
 
     public static function getEntityFqcn(): string
@@ -35,9 +38,29 @@ class CardStopCrudController extends AbstractCrudController {
 
     public function configureFields(string $pageName): iterable
     {
+        $genericImageSrc = $this->assetManager->getUrl('images/Fernley.png');
+        $assetManager = $this->assetManager;
+
         yield IdField::new('id')
             ->onlyOnIndex();
-        yield TextField::new('card_stop_name');
+        yield TextField::new('card_stop_name')
+            ->onlyOnIndex()
+            ->renderAsHtml()
+            ->formatValue(static function ($value, CardStop $cardStop) use ($assetManager, $genericImageSrc)
+            {
+                $logoSrc = trim((string) $cardStop->getLogo()) !== '' ? $assetManager->getUrl($cardStop->getLogo()) : $genericImageSrc;
+                $safeLogoSrc = htmlspecialchars($logoSrc, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+                $safeName = htmlspecialchars((string) $cardStop->getCardStopName(), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+
+                return sprintf(
+                    '<span class="d-inline-flex align-items-center gap-2"><img src="%s" alt="%s" style="height:32px;width:32px;object-fit:contain;" />%s</span>',
+                    $safeLogoSrc,
+                    $safeName,
+                    $safeName
+                );
+            });
+        yield TextField::new('card_stop_name')
+            ->onlyOnForms();
         yield NumberField::new('longitude');
         yield NumberField::new('latitude');
         yield TextField::new('logo');

@@ -1,5 +1,10 @@
 {% extends '@EasyAdmin/page/content.html.twig' %}
 
+{% block head_stylesheets %}
+    {{ parent() }}
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=10.0, user-scalable=yes">
+{% endblock %}
+
 {% block content %}
 
 <div class="content">
@@ -70,7 +75,8 @@
                     <tr>
                         <td>{{ activity.playerName }}</td>
                         <td>{{ activity.checkInTime|date('Y-m-d H:i:s') }}</td>
-                        <td>{{ activity.location }}</td>
+                        <td><span class="d-inline-flex align-items-center gap-2"><img src="{{ asset(activity.logo) }}" alt="{{ activity.location }}" style="height:32px;width:32px;object-fit:contain;" />{{ activity.location }}</span>
+                        </td>
                     </tr>
                 {% endfor %}
             </tbody>

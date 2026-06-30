@@ -125,6 +125,10 @@ class PlayingCard
     {
         return $this->location?->getCardStop()?->getCardStopName();
     }
+    public function getLocationLogo(): ?string
+    {
+        return $this->location?->getCardStop()?->getLogo();
+    }
 
     public function setLocation(?PlayerLocation $location): static
     {

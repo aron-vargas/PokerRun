@@ -14,12 +14,12 @@ use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractDashboardController;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Messenger\MessageBusInterface;
+use Symfony\Component\Asset\Packages;
 
 #[AdminDashboard(routePath: '/cardstop', routeName: 'cardstop')]
 class CardStopDashboardController extends AbstractDashboardController {
-    public function __construct(private PlayerLocationRepository $playerLocationRepository, private MessageBusInterface $messageBus)
+    public function __construct(private PlayerLocationRepository $playerLocationRepository, private MessageBusInterface $messageBus, private Packages $assetManager)
     {
-
     }
 
     #[Route('/cardstop', name: 'app_cardstop')]
@@ -97,8 +97,9 @@ class CardStopDashboardController extends AbstractDashboardController {
 
     public function configureDashboard(): Dashboard
     {
-        return Dashboard::new()
-            ->setTitle('Poker Run Card Stop');
+        $src = $this->assetManager->getUrl('images/Main Street Fernley.png');
+        $title = sprintf('<img src="%s" alt="Main Street Fernley" style="height: 35px;"><br/>Main Street Fernley - PokerRun', $src);
+        return Dashboard::new()->setTitle($title);
     }
 
     public function configureMenuItems(): iterable

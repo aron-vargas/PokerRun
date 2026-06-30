@@ -85,46 +85,52 @@ class UserCrudController extends AbstractCrudController
                 'second_options' => ['label' => 'Repeat Password'],
                 'required' => false, // Makes it optional!
             ]);
-        yield BooleanField::new('active');
-        yield BooleanField::new('isVerified');
-        yield DateField::new('createdOn')
-            ->onlyOnIndex();
-        yield IntegerField::new('createdBy')
-            ->onlyOnIndex();
-        yield DateField::new('modifiedOn')
-            ->onlyOnIndex();
-        yield IntegerField::new('modifiedBy')
-            ->onlyOnIndex();
 
-        //yield AvatarField::new('avatar')
-        //    ->formatValue(static function ($value, User $user) {
-        //        return $user->getAvatar();
-        //    })
-        //    ->hideOnForm();
-        // yield ImageField::new('avatar')
-        //     ->setBasePath('uploads/avatars')
-        //     ->setUploadDir('public/avatars/uploads')
-        //     ->setUploadedFileNamePattern('[slug]-[timestamp].[extension]')
-        //     ->onlyOnForms();
-            
-        yield ChoiceField::new('roles')
-            ->setChoices([
-                'Super Admin' => 'ROLE_SUPER_ADMIN',
-                'Admin' => 'ROLE_ADMIN',
-                'User' => 'ROLE_USER',
-                'Player' => 'ROLE_PLAYER',
-                'Card Stop' => 'ROLE_CARD_STOP',
-                'Impersonator' => 'ROLE_ALLOWED_TO_SWITCH',
-            ])
-            ->allowMultipleChoices()
-            ->renderAsBadges();
+        // Admin-only fields
+        if ($this->isGranted('ROLE_ADMIN'))
+        {
+            yield BooleanField::new('active');
+            yield BooleanField::new('isVerified');
+            yield DateField::new('createdOn')
+                ->onlyOnIndex();
+            yield IntegerField::new('createdBy')
+                ->onlyOnIndex();
+            yield DateField::new('modifiedOn')
+                ->onlyOnIndex();
+            yield IntegerField::new('modifiedBy')
+                ->onlyOnIndex();
 
-        yield AssociationField::new('cardStop')
-            ->setFormTypeOptions([
-                'class' => CardStop::class,
-                'choice_label' => 'card_stop_name',
-            ]);
-          
+            //yield AvatarField::new('avatar')
+            //    ->formatValue(static function ($value, User $user) {
+            //        return $user->getAvatar();
+            //    })
+            //    ->hideOnForm();
+            // yield ImageField::new('avatar')
+            //     ->setBasePath('uploads/avatars')
+            //     ->setUploadDir('public/avatars/uploads')
+            //     ->setUploadedFileNamePattern('[slug]-[timestamp].[extension]')
+            //     ->onlyOnForms();
+
+            yield ChoiceField::new('roles')
+                ->setChoices([
+                    'Super Admin' => 'ROLE_SUPER_ADMIN',
+                    'Admin' => 'ROLE_ADMIN',
+                    'User' => 'ROLE_USER',
+                    'Player' => 'ROLE_PLAYER',
+                    'Card Stop' => 'ROLE_CARD_STOP',
+                    'Impersonator' => 'ROLE_ALLOWED_TO_SWITCH',
+                ])
+                ->allowMultipleChoices()
+                ->renderAsBadges();
+
+            yield AssociationField::new('cardStop')
+                ->setFormTypeOptions([
+                    'class' => CardStop::class,
+                    'choice_label' => 'card_stop_name',
+                ]);
+
+        }
+
 
        // return $qb;
         // yield AssociationField::new('pokerHand')
@@ -156,7 +162,7 @@ class UserCrudController extends AbstractCrudController
                 $this->passwordHasher->hashPassword($user, $user->getPlainPassword())
             );
             // Important: erase credentials to clear plaintext from memory
-            $user->setPlainPassword(null); 
+            $user->setPlainPassword(null);
         }
     }
 }

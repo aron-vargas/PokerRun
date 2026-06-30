@@ -1,9 +1,14 @@
 {# templates/admin/custom.html.twig #}
 {% extends '@EasyAdmin/page/content.html.twig' %}
 
+{% block head_stylesheets %}
+    {{ parent() }}
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=10.0, user-scalable=yes">
+{% endblock %}
+
 {% block content_title %}Card Stop - Check IN{% endblock %}
 
-{% block content %}
+{% block main %}
 
  {{ include('menus/playerbar.html.twig') }}
 
@@ -24,7 +29,7 @@
         {% if app.user and app.user.getLocation() %}
             {% if not app.user.getLocation().isVerified() %}
                 <div class="alert alert-warning">
-                    <img class="me-2" src="{{ app.user.getLocation().getCardStop().getLogo() }}" style="height: 50px; width: auto;"/>
+                    <img class="me-2" src="{{ asset(app.user.getLocation().getCardStop().getLogo()) }}" style="height: 50px; width: auto;"/>
                     <span>
                         Your check-in at {{ app.user.getLocationName() }} is pending verification.
                         <br/>
@@ -33,7 +38,10 @@
                 </div>
             {% else %}
                 <div class="alert alert-info" role="alert">
+                    <img class="me-2" src="{{ asset(app.user.getLocation().getCardStop().getLogo()) }}" style="height: 50px; width: auto;"/>
+                    <span>
                     You are currently checked in at {{ app.user.getLocationName() }}.
+                    </span>
                 </div>
             {% endif %}
         {% elseif form is defined and form %}

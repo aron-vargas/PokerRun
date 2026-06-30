@@ -68,6 +68,10 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
             ->select('COUNT(u)')
             ->andWhere('u.active = :val')
             ->setParameter('val', true)
+            ->andWhere('u.isVerified = :val')
+            ->setParameter('val', true)
+            ->andWhere('u.roles LIKE :role')
+            ->setParameter('role', '%ROLE_PLAYER%')
             ->orderBy('u.id', 'ASC')
             ->getQuery()
             ->getSingleScalarResult();

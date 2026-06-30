@@ -2,6 +2,11 @@
 {# templates/admin/custom.html.twig #}
 {% extends '@EasyAdmin/page/content.html.twig' %}
 
+{% block head_stylesheets %}
+    {{ parent() }}
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=10.0, user-scalable=yes">
+{% endblock %}
+
 {% block content_title %}
     <div style="border-bottom: 1px solid #3f3f3f; padding-bottom: 1rem;">
     {% if app.user and app.user.cardStop %}

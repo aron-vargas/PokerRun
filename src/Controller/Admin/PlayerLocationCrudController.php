@@ -16,15 +16,18 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\DateField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
+use Symfony\Component\Asset\Packages;
 use Doctrine\Persistence\ManagerRegistry;
 use phpDocumentor\Reflection\Types\Boolean;
 
 class PlayerLocationCrudController extends AbstractCrudController {
     private ManagerRegistry $doctrine;
+    private Packages $assetManager;
 
-    public function __construct(ManagerRegistry $doctrine)
+    public function __construct(ManagerRegistry $doctrine, Packages $assetManager)
     {
         $this->doctrine = $doctrine;
+        $this->assetManager = $assetManager;
     }
 
     public static function getEntityFqcn(): string
@@ -87,6 +90,9 @@ class PlayerLocationCrudController extends AbstractCrudController {
             $cardStopChoices = [$playerLocation->getCardStop()];
         }
 
+        $genericImageSrc = $this->assetManager->getUrl('images/Fernley.png');
+        $assetManager = $this->assetManager;
+
         yield IdField::new('id')
             ->onlyOnIndex();
         yield BooleanField::new('isVerified');
@@ -129,6 +135,21 @@ class PlayerLocationCrudController extends AbstractCrudController {
                 'class' => CardStop::class,
                 'choice_label' => 'card_stop_name',
                 'choices' => $cardStopChoices,
-            ]);
+            ])
+            ->renderAsHtml()
+            ->formatValue(static function ($value, PlayerLocation $location) use ($assetManager, $genericImageSrc)
+            {
+                $cardStop = $location->getCardStop();
+                $logoSrc = trim((string) $cardStop->getLogo()) !== '' ? $assetManager->getUrl($cardStop->getLogo()) : $genericImageSrc;
+                $safeLogoSrc = htmlspecialchars($logoSrc, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+                $safeName = htmlspecialchars((string) $cardStop->getCardStopName(), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+
+                return sprintf(
+                    '<span class="d-inline-flex align-items-center gap-2"><img src="%s" alt="%s" style="height:32px;width:32px;object-fit:contain;" />%s</span>',
+                    $safeLogoSrc,
+                    $safeName,
+                    $safeName
+                );
+            });
     }
 }

@@ -56,6 +56,7 @@ class CheckInFormType extends AbstractType {
                 'expanded' => true,
                 'multiple' => false,
                 'required' => true,
+                'label_attr' => ['class' => 'checkin-row pb-2 mb-2'],
                 // allow HTML inside the label (we build an <img> + name)
                 'label_html' => true,
                 'choice_label' => function (CardStop $cardStop) use ($genericImageSrc)
@@ -65,7 +66,7 @@ class CheckInFormType extends AbstractType {
 
                     if ($logo)
                     {
-                        $src = $logo;
+                        $src = $this->assetManager->getUrl($logo);
                     }
                     else
                     {
@@ -73,7 +74,7 @@ class CheckInFormType extends AbstractType {
                         $src = $genericImageSrc;
                     }
 
-                    return sprintf('<img src="%s" alt="%s logo" style="height:24px;width:24px;object-fit:cover;margin-right:8px;border-radius:4px;vertical-align:middle;">%s', $src, $name, $name);
+                    return sprintf('<img src="%s" alt="%s logo" class="card-stop-logo"><span class="fs-2">%s</span>', $src, $name, $name);
                 },
                 'query_builder' => function (CardStopRepository $repo) use ($user, $options)
                 {

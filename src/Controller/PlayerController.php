@@ -520,4 +520,13 @@ final class PlayerController extends AbstractController {
             'controller_name' => 'PlayerController',
         ]);
     }
+
+    #[Route('/map', name: 'app_map')]
+    #[AdminRoute('/map', name: 'app_map')]
+    public function map(): Response
+    {
+        return $this->render('home/map.html.twig', [
+            'controller_name' => 'PlayerController',
+        ]);
+    }
 }

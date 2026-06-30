@@ -1,6 +1,11 @@
 {# templates/admin/custom.html.twig #}
 {% extends '@EasyAdmin/page/content.html.twig' %}
 
+{% block head_stylesheets %}
+    {{ parent() }}
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=10.0, user-scalable=yes">
+{% endblock %}
+
 {% block content_title %}Main Street Fernley's Poker Run{% endblock %}
 
 {% set user = app.user %}
@@ -56,8 +61,10 @@
             {% set card1No = '1' %}
             {% if user.pokerHand and user.pokerHand.getCardOne() %}
                 {% set card1img = user.pokerHand.getCardOne().getImage() %}
+                {% set logo_src = asset(user.pokerHand.getCardOne().getLocationLogo()) %}
             {% else %}
                 {% set card1img = 'images/PlayingCards/red-back.png' %}
+                {% set logo_src = asset('images/Fernley.png') %}
             {% endif %}
             <div class="card poker-card">
                 <div class="poker-card-body" style="background-image: url('{{ asset(card1img) }}');">
@@ -132,11 +139,18 @@
             {% if user.cardList|length > 0 %}
                 {% for card in user.cardList %}
                     {% set cardimg = card.getImage() %}
+
+                    {% if card.getLocationLogo() %}
+                        {% set logo_src = asset(card.getLocationLogo()) %}
+                    {% else %}
+                        {% set logo_src = asset('images/Fernley.png') %}
+                    {% endif %}
                     <div class="card poker-card">
                         <div class="poker-card-body" style="background-image: url('{{ asset(cardimg) }}');">
 
                         </div>
                          <div class="pcf">
+                            <img src="{{ logo_src }}" alt="Location Logo" class="card-stop-thumb">
                             @ {{ card.getLocationName()|capitalize }}
                         </div>
                     </div>

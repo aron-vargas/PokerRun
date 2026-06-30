@@ -67,7 +67,7 @@ class PlayerLocationRepository extends ServiceEntityRepository
     public function findRecentActivity(int $limit = 10): array
     {
         $rows = $this->createQueryBuilder('pl')
-            ->select('u.firstName AS firstName', 'u.lastName AS lastName', 'pl.checkinTime AS checkinTime', 'cs.card_stop_name AS location')
+            ->select('u.firstName AS firstName', 'u.lastName AS lastName', 'pl.checkinTime AS checkinTime', 'cs.card_stop_name AS location', 'cs.logo AS logo')
             ->join('pl.Player', 'u')
             ->leftJoin('pl.CardStop', 'cs')
             ->andWhere('pl.checkinTime IS NOT NULL')
@@ -81,6 +81,7 @@ class PlayerLocationRepository extends ServiceEntityRepository
                 'playerName' => trim(sprintf('%s %s', $row['firstName'] ?? '', $row['lastName'] ?? '')),
                 'checkInTime' => $row['checkinTime'],
                 'location' => $row['location'] ?? 'Unknown',
+                'logo' => $row['logo'] ?? '/images/Fernley.png',
             ];
         }, $rows);
     }
@@ -88,7 +89,7 @@ class PlayerLocationRepository extends ServiceEntityRepository
     public function findRecentPurchases(int $limit = 10): array
     {
         $rows = $this->createQueryBuilder('pl')
-            ->select('u.firstName AS firstName', 'u.lastName AS lastName', 'pl.checkinTime AS checkinTime', 'cs.card_stop_name AS location')
+            ->select('u.firstName AS firstName', 'u.lastName AS lastName', 'pl.checkinTime AS checkinTime', 'cs.card_stop_name AS location', 'cs.logo AS logo')
             ->join('pl.Player', 'u')
             ->leftJoin('pl.CardStop', 'cs')
             ->andWhere('pl.purchaseTime IS NOT NULL')
@@ -103,6 +104,7 @@ class PlayerLocationRepository extends ServiceEntityRepository
                 'playerName' => trim(sprintf('%s %s', $row['firstName'] ?? '', $row['lastName'] ?? '')),
                 'purchaseTime' => $row['purchaseTime'],
                 'location' => $row['location'] ?? 'Unknown',
+                'logo' => $row['logo'] ?? '/images/Fernley.png',
             ];
         }, $rows);
     }
@@ -110,7 +112,7 @@ class PlayerLocationRepository extends ServiceEntityRepository
     public function findCardStopUnverified(int $card_stop_id, int $limit=100): array
     {
         $rows = $this->createQueryBuilder('pl')
-            ->select('pl.id AS id', 'u.id AS player_id', 'u.firstName AS firstName', 'u.lastName AS lastName', 'pl.checkinTime AS checkinTime', 'cs.card_stop_name AS location')
+            ->select('pl.id AS id', 'u.id AS player_id', 'u.firstName AS firstName', 'u.lastName AS lastName', 'pl.checkinTime AS checkinTime', 'cs.card_stop_name AS location', 'cs.logo AS logo')
             ->join('pl.Player', 'u')
             ->leftJoin('pl.CardStop', 'cs')
             ->andWhere('u.isVerified = 1')
@@ -128,11 +130,11 @@ class PlayerLocationRepository extends ServiceEntityRepository
     public function findCardStopNoPurchase(int $card_stop_id, int $limit = 100): array
     {
         $rows = $this->createQueryBuilder('pl')
-            ->select('pl.id AS id', 'u.id AS player_id', 'u.firstName AS firstName', 'u.lastName AS lastName', 'pl.checkinTime AS checkinTime', 'cs.card_stop_name AS location')
+            ->select('pl.id AS id', 'u.id AS player_id', 'u.firstName AS firstName', 'u.lastName AS lastName', 'pl.checkinTime AS checkinTime', 'cs.card_stop_name AS location', 'cs.logo AS logo')
             ->join('pl.Player', 'u')
             ->leftJoin('pl.CardStop', 'cs')
             ->andWhere('pl.isVerified = 1')
-            ->andWhere('pl.purchase_time is null')
+            ->andWhere('pl.purchaseTime is null')
             ->andWhere('cs.id = :stop')
             ->setParameter('stop', $card_stop_id)
             ->orderBy('pl.checkinTime', 'DESC')

@@ -29,6 +29,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Messenger\MessageBusInterface;
+use Symfony\Component\Asset\Packages;
 
 #[AdminDashboard(routePath: '/admin', routeName: 'admin')]
 class DashboardController extends AbstractDashboardController {
@@ -38,6 +39,7 @@ class DashboardController extends AbstractDashboardController {
     private UserRepository $userRepository;
     private AdminUrlGenerator $adminUrlGenerator;
     private MessageBusInterface $messageBus;
+    private Packages $assetManager;
 
     public function __construct(
         PlayerLocationRepository $playerLocationRepository,
@@ -45,7 +47,8 @@ class DashboardController extends AbstractDashboardController {
         PokerHandRepository $pokerHandRepository,
         UserRepository $userRepository,
         AdminUrlGenerator $adminUrlGenerator,
-        MessageBusInterface $messageBus
+        MessageBusInterface $messageBus,
+        Packages $assetManager
     ) {
         $this->playerLocationRepository = $playerLocationRepository;
         $this->playingCardRepository = $playingCardRepository;
@@ -53,6 +56,7 @@ class DashboardController extends AbstractDashboardController {
         $this->userRepository = $userRepository;
         $this->adminUrlGenerator = $adminUrlGenerator;
         $this->messageBus = $messageBus;
+        $this->assetManager = $assetManager;
     }
 
     #[IsGranted('ROLE_ADMIN')]
@@ -125,8 +129,9 @@ class DashboardController extends AbstractDashboardController {
 
     public function configureDashboard(): Dashboard
     {
-        return Dashboard::new()
-            ->setTitle('Main Street Fernley<br/> PokerRun Admin');
+        $src = $this->assetManager->getUrl('images/Main Street Fernley.png');
+        $title = sprintf('<img src="%s" alt="Main Street Fernley" style="height: 35px;"><br/>Main Street Fernley - PokerRun', $src);
+        return Dashboard::new()->setTitle($title);
     }
 
     public function configureMenuItems(): iterable
