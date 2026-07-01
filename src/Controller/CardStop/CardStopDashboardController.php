@@ -35,7 +35,7 @@ class CardStopDashboardController extends AbstractDashboardController {
         return $this->render('card_stop/index.html.twig', ['user' => $user, 'pendingVerifications' => $pendingVerifications]);
     }
 
-    #[AdminRoute('/checkin/confirm/{location_id}/{player_id}', name: 'checkin_confirm')]
+    #[AdminRoute('/confirm/{location_id}/{player_id}', name: 'app_cardstop_confirm')]
     public function confirmCheckin(int $location_id, int $player_id): Response
     {
         // Get the user object
@@ -60,7 +60,7 @@ class CardStopDashboardController extends AbstractDashboardController {
         ]);
     }
 
-    #[AdminRoute('/checkin/deny/{location_id}/{player_id}', name: 'checkin_deny')]
+    #[AdminRoute('/deny/{location_id}/{player_id}', name: 'app_cardstop_deny')]
     public function denyCheckin(int $location_id, int $player_id): Response
     {
         // Get the user object

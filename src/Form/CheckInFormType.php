@@ -87,7 +87,7 @@ class CheckInFormType extends AbstractType {
             // field name, field type, field options
             $form->add('CardStop', EntityType::class, $formOptions);
             $form->add('save', SubmitType::class, [
-                'label' => 'Check It', // Text displayed on the button
+                'label' => 'Check In', // Text displayed on the button
                 'attr' => ['class' => 'btn btn-primary', 'disabled' => !$options['user_is_verified']] // Optional: add CSS classes
             ]);
         });

@@ -44,7 +44,8 @@ class PlayerDashboardController extends AbstractDashboardController
 
     public function configureUserMenu(UserInterface $user): UserMenu
     {
-        if (!$user instanceof User) {
+        if (!$user instanceof User)
+        {
             throw new \Exception('Invalid user');
         }
 

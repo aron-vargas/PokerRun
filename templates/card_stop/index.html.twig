@@ -33,7 +33,7 @@
     <h1 class='title'>
         Player Checkins
         <small class="float-end">
-            <a class="btn btn-primary btn-small p-2" href="{{ path('app_card_stop') }}"><i class="fa fa-refresh"></i></a>
+            <a class="btn btn-primary btn-small p-2" href="{{ path('app_cardstop') }}"><i class="fa fa-refresh"></i></a>
         </small>
     </h1>
     <table class="table table-striped mb-6">
@@ -51,8 +51,8 @@
                     <td>{{ location.checkinTime|date('Y-m-d H:i:s') }}</td>
                     <td>{{ location.location }}</td>
                     <td>
-                        <a class="btn btn-success" href="{{ path('cardstop_checkin_confirm', {'location_id': location.id, 'player_id': location.player_id}) }}">Confirm</a>
-                        <a class="btn btn-danger" href="{{ path('cardstop_checkin_deny', {'location_id': location.id, 'player_id': location.player_id}) }}">Deny</a>
+                        <a class="btn btn-success" href="{{ path('cardstop_app_cardstop_confirm', {'location_id': location.id, 'player_id': location.player_id}) }}">Confirm</a>
+                        <a class="btn btn-danger" href="{{ path('cardstop_app_cardstop_deny', {'location_id': location.id, 'player_id': location.player_id}) }}">Deny</a>
                     </td>
                 </tr>
             {% endfor %}
